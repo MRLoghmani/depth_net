@@ -3,6 +3,7 @@ import lmdb
 import argparse
 import cv2
 import sys
+import string
 caffe_root = 'home/hades/caffe/'  # this file should be run from {caffe_root}/examples (otherwise change this line)
 sys.path.insert(0, caffe_root + 'python')
 import caffe
@@ -39,25 +40,25 @@ else:
     exit()
 with env.begin(write=True) as txn:
     # txn is a Transaction object
-counter=0
-print "num files:%d" % range(num_files)
-root_dir=args.root_dir
-for i in range(num_files):
-    print "file: %d" % i
-    (im_path, label) = images[i].split()
+    counter=0
+    print "num files:%d" % num_files
+    root_dir=args.root_dir
+    for i in range(num_files):
+        print "file: %d" % i
+        (im_path, label) = images[i].split()
    # import code
    # code.interact(local=locals()) 
-    datum = caffe.proto.caffe_pb2.Datum()
-    datum.channels = 1
-    datum.height = res
-    datum.width = res
-    fullfilepath=string.join(root_dir,im_path)
-    img = cv2.imread(fullfilepath, flags)
-    import code 
-    code.interact(local=locals())
-    datum.data = img.tobytes()  # or .tostring() if numpy < 1.9
-    datum.label = int(label)
-    str_id = '{:08}'.format(i)
+        datum = caffe.proto.caffe_pb2.Datum()
+        datum.channels = 1
+        datum.height = res
+   	datum.width = res
+    	fullfilepath=string.join(root_dir,im_path)
+   	img = cv2.imread(fullfilepath, flags)
+    	import code 
+    	code.interact(local=locals())
+    	datum.data = img.tobytes()  # or .tostring() if numpy < 1.9
+    	datum.label = int(label)
+    	str_id = '{:08}'.format(i)
 
         # The encode is only essential in Python 3
-    txn.put(str_id.encode('ascii'), datum.SerializeToString())
+    	txn.put(str_id.encode('ascii'), datum.SerializeToString())
