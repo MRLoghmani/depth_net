@@ -1,14 +1,17 @@
 import numpy as np
 import lmdb
-import caffe
 import argparse
 import cv2
-
+import sys
+caffe_root = 'home/hades/caffe/'  # this file should be run from {caffe_root}/examples (otherwise change this line)
+sys.path.insert(0, caffe_root + 'python')
+import caffe
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument("input_file",help="This file contains the input HDR images")
+    parser.add_argument("input_file",help="This txt file contains the input png images")
+    parser.add_argument("root_dir",help="The root folder of the pngs files")
     parser.add_argument("output_folder",help="The folder where to save the lmdb")
-
+    parser.add_argument("bits",help="bits precision, 8 or 16")
     args = parser.parse_args()
     return args
 
@@ -23,19 +26,28 @@ args = parse_args()
 # transaction.
 images = open(args.input_file).readlines()
 num_files  = len(images)
-map_size = num_files * res * res * 2  # 2 is because we have 16bit data
+map_size = num_files * res * res * 4  # 2 is because we have 16bit data
 
 env = lmdb.open(args.output_folder, map_size=map_size)
 
+if (args.bits=='8'):
+    flags=cv2.IMREAD_GRAYSCALE
+elif (args.bits=='16'):
+    flags=cv2.IMREAD_ANYDEPTH + cv2.IMREAD_GRAYSCALE
+else: 
+    print("choose between 8 or 16 bits as third argument!")
+    exit()
 with env.begin(write=True) as txn:
     # txn is a Transaction object
     for i in range(num_files):
         (im_path, label) = images[i].split()
+        import code
+        code.interact(local=locals()) 
         datum = caffe.proto.caffe_pb2.Datum()
         datum.channels = 1
         datum.height = res
         datum.width = res
-        img = cv2.imread(im_path, cv2.IMREAD_ANYDEPTH + cv2.IMREAD_GRAYSCALE)
+        img = cv2.imread(join(args.root_dir,im_path), flags)
         datum.data = img.tobytes()  # or .tostring() if numpy < 1.9
         datum.label = int(label)
         str_id = '{:08}'.format(i)
