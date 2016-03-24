@@ -41,5 +41,7 @@ def get_instances(input_path):
 if __name__ == '__main__':
     args = parse_args()
     (train, test) = get_instances(args.input_folder)
-    create_split(train, os.path.join(args.output_path, "train.txt", args.input_folder)
-    create_split(test, os.path.join(args.output_path, "test.txt", args.input_folder)
+    create_split(train, os.path.join(
+        args.output_path, "train.txt", args.input_folder))
+    create_split(test, os.path.join(
+        args.output_path, "test.txt", args.input_folder))
