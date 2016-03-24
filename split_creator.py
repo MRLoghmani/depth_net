@@ -29,7 +29,7 @@ def get_instances(input_path):
     test_instances = {}
     train_instances = {}
     for folder in folders:
-        category_path = os.join(input_path, folder)
+        category_path = os.path.join(input_path, folder)
         instances = [o for o in os.listdir(category_path) if os.path.isdir(
             os.path.join(category_path, o))]
         if len(instances) <= 1:
@@ -42,6 +42,6 @@ if __name__ == '__main__':
     args = parse_args()
     (train, test) = get_instances(args.input_folder)
     create_split(train, os.path.join(
-        args.output_path, "train.txt", args.input_folder))
+        args.output_path, "train.txt"), args.input_folder)
     create_split(test, os.path.join(
-        args.output_path, "test.txt", args.input_folder))
+        args.output_path, "test.txt"), args.input_folder)
