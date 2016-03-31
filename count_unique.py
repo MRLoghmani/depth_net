@@ -1,9 +1,9 @@
 import argparse
 from PIL import Image
 import imagehash
-import glob
 import os
-from random import randrange
+
+#from random import randrange
 
 
 def parse_args():
@@ -18,14 +18,13 @@ if __name__ == '__main__':
     args = parse_args()
     imageset = set()
     with open(args.input_file) as filelist:
-        filecount = len(filelist)
         k = 0
-        print "Starting hashing of %d images" % filecount
+        print "Starting hashing of images"
         for line in filelist:
-            I = Image.open(os.join(args.input_folder, line))
+            I = Image.open(os.path.join(args.input_folder, line).strip())
             imageset.add(str(imagehash.phash(I)))
             if (k % 1000) == 0:
-                print "Parsed item %d of %d" % (k, filecount)
+                print "Parsed item %d" % (k)
             k += 1
     print "There are %d unique files in the %d input images" % (len(imageset),
-                                                                filecount)
+                                                                k)
