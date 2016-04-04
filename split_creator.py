@@ -53,6 +53,6 @@ if __name__ == '__main__':
         args.output_path, "train.txt"), args.input_folder, labels)
     create_split(test, os.path.join(
         args.output_path, "test.txt"), args.input_folder, labels)
-    with open(os.path.join(args.output_path, "labels.txt"),"wt") as fl:
+    with open(os.path.join(args.output_path, "labels.txt"), "wt") as fl:
         for l in labels:
             fl.write(l + "\n")
