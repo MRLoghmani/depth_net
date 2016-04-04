@@ -22,7 +22,8 @@ def create_split(categories, output_name, root_folder, labels):
                     root_folder, cat, instance, "*.png"))
                 for img in images:
                     out_file.write(img[l_root:] + " " + str(l) + "\n")
-
+   # import code 
+   # code.interact(local=locals())
 
 def get_instances(input_path):
     folders = [o for o in os.listdir(

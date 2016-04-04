@@ -3,8 +3,8 @@ import lmdb
 import argparse
 import cv2
 import sys
-import string
-caffe_root = 'home/hades/caffe/'  # this file should be run from {caffe_root}/examples (otherwise change this line)
+import os
+caffe_root = '/home/hades/caffe/'  # this file should be run from {caffe_root}/examples (otherwise change this line)
 sys.path.insert(0, caffe_root + 'python')
 import caffe
 def parse_args():
@@ -44,7 +44,8 @@ with env.begin(write=True) as txn:
     print "num files:%d" % num_files
     root_dir=args.root_dir
     for i in range(num_files):
-        print "file: %d" % i
+        if ((i % 1000)==0):           
+            print "file: %d" % i
         (im_path, label) = images[i].split()
    # import code
    # code.interact(local=locals()) 
@@ -52,10 +53,10 @@ with env.begin(write=True) as txn:
         datum.channels = 1
         datum.height = res
    	datum.width = res
-    	fullfilepath=string.join(root_dir,im_path)
+    	fullfilepath=os.path.join(root_dir,im_path)
    	img = cv2.imread(fullfilepath, flags)
-    	import code 
-    	code.interact(local=locals())
+    	#import code 
+    	#code.interact(local=locals())
     	datum.data = img.tobytes()  # or .tostring() if numpy < 1.9
     	datum.label = int(label)
     	str_id = '{:08}'.format(i)
