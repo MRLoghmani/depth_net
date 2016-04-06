@@ -44,13 +44,13 @@ for ob in scene.objects:
         ob.select = True
 bpy.ops.object.delete() #remove all non meshes
 bpy.ops.object.select_all()
-bpy.context.scene.objects.active = bpy.data.objects[0]
+scene.objects.active = bpy.data.objects[0]
 bpy.ops.object.join()
 bpy.ops.object.transform_apply(location=False, rotation=True, scale=False)
 ob = bpy.context.object
 ob.name = "All Meshes"
 ob.dimensions = ob.dimensions / max(ob.dimensions) #scaling on max dimension
-bpy.context.scene.cursor_location = (0.0,0.0,0.0)
+scene.cursor_location = (0.0,0.0,0.0)
 # set the origin on the current object to the 3dcursor location
 bpy.ops.object.origin_set(type='ORIGIN_CURSOR')
 #bpy.ops.object.origin_set(type='ORIGIN_CENTER_OF_MASS')
@@ -69,17 +69,17 @@ ob.location.z = -(minz)
 
 
 #set scene unit to Metrics (centimeters!)
-bpy.data.scenes["Scene"].unit_settings.system='METRIC'
+scene.unit_settings.system='METRIC'
 
 #set scene resolution&engine:
 scene.render.resolution_x = 256
 scene.render.resolution_y = 256
 scene.render.resolution_percentage = 100
 ZoomDist=scene.render.resolution_x/256 #value that I need to multiply to Camdist to get the "256px size"
-bpy.data.scenes['Scene'].render.engine = 'CYCLES' # We use the Cycles Render
+scene.render.engine = 'CYCLES' # We use the Cycles Render
 
 #bpy.data.scenes['Scene'].render.image_settings.color_mode='BW'
-cycles=bpy.data.scenes['Scene'].cycles
+cycles=scene.cycles
 #cycles.samples = 128
 cycles.max_bounces=0
 cycles.glossy_bounces=0
@@ -94,8 +94,8 @@ cycles.use_cache=True#increase the performance: a lot!
 cam = bpy.data.cameras.new("Camera")
 cam.clip_end=30.0 #not working for z depth, still not clipping it.
 cam_ob = bpy.data.objects.new("Camera", cam)
-bpy.context.scene.objects.link(cam_ob)
-bpy.context.scene.camera = cam_ob
+scene.objects.link(cam_ob)
+scene.camera = cam_ob
 cam_ob.location=(2,0,5)
 ob_target = bpy.data.objects.get('All Meshes', False)
 track=bpy.data.objects["Camera"].constraints.new(type='TRACK_TO')
