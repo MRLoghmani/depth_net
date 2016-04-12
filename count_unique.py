@@ -16,15 +16,26 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
-    imageset = set()
+    #    imageset = set()
+    goodhash = {}
+    simplehash = {}
     with open(args.input_file) as filelist:
         k = 0
         print "Starting hashing of images"
         for line in filelist:
-            I = Image.open(os.path.join(args.input_folder, line).strip())
-            imageset.add(str(imagehash.phash(I)))
-            if (k % 1000) == 0:
-                print "Parsed item %d" % (k)
+            impath = os.path.join(args.input_folder, line).strip()
+            I = Image.open(impath)
+            goodhash[str(imagehash.phash(I))] = impath
+            simplehash[str(imagehash.phash_simple(I))] = impath
+            if (k % 2000) == 0:
+                print "Parsed item %d - good %d/%d" % (k, len(goodhash),
+                                                       len(simplehash))
             k += 1
-    print "There are %d unique files in the %d input images" % (len(imageset),
-                                                                k)
+    print "There are %d/%d unique files in the %d input images" % (
+        len(goodhash), len(simplehash), k)
+    with open("hash.txt","wt") as hf:
+        for k in goodhash.keys():
+            hf.write(goodhash[k]+"\n")
+    with open("simple_hash.txt","wt") as hf:
+        for k in simplehash.keys():
+            hf.write(simplehash[k]+"\n")
