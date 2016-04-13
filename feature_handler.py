@@ -1,5 +1,5 @@
 import os
-#os.environ['GLOG_minloglevel'] = '2'
+os.environ['GLOG_minloglevel'] = '2'
 import caffe
 from caffe.proto import caffe_pb2
 from google.protobuf import text_format
@@ -25,7 +25,7 @@ def get_net(caffemodel, deploy_file, use_gpu=True):
     return caffe.Net(deploy_file, caffemodel, caffe.TEST)
 
 
-def get_transformer(deploy_file, mean_file=None):
+def get_transformer(deploy_file, mean_file=None, mean_pixel=None):
     """
     Returns an instance of caffe.io.Transformer
     Arguments:
@@ -55,6 +55,7 @@ def get_transformer(deploy_file, mean_file=None):
 
     if mean_file:
         # set mean pixel
+        print "Using mean file"
         with open(mean_file, 'rb') as infile:
             blob = caffe_pb2.BlobProto()
             blob.MergeFromString(infile.read())
@@ -70,6 +71,9 @@ def get_transformer(deploy_file, mean_file=None):
                     'blob does not provide shape or 4d dimensions')
             pixel = np.reshape(blob.data, blob_dims[1:]).mean(1).mean(1)
             t.set_mean('data', pixel)
+    if mean_pixel:
+        print "Using mean pixel"
+        t.set_mean('data', np.ones(1) * mean_pixel)
 
     return t
 
@@ -107,7 +111,7 @@ def forward_pass(images, net, transformer, batch_size=None):
     """
     if batch_size is None:
         batch_size = 1
-
+    batch_size = min(batch_size, len(images))
     caffe_images = []
     for image in images:
         if image.ndim == 2:
@@ -118,7 +122,10 @@ def forward_pass(images, net, transformer, batch_size=None):
     dims = transformer.inputs['data'][1:]
 
     fc6 = fc7 = None
-    for chunk in [caffe_images[x:x + batch_size] for x in xrange(0, len(caffe_images), batch_size)]:
+    todoChunks = [caffe_images[x:x + batch_size] for x in xrange(0, len(caffe_images), batch_size)]
+    start = time.clock()
+    for k, chunk in enumerate(todoChunks):
+        print "Processing batch %d out of %d" % (k, len(todoChunks))
         new_shape = (len(chunk),) + tuple(dims)
         if net.blobs['data'].data.shape != new_shape:
             net.blobs['data'].reshape(*new_shape)
@@ -132,6 +139,7 @@ def forward_pass(images, net, transformer, batch_size=None):
         else:
             fc6 = np.vstack((fc6, net.blobs['fc6'].data))
             fc7 = np.vstack((fc7, net.blobs['fc7'].data))
+    print "It took %f" % (time.clock() - start)
     return (fc6, fc7)
 
 
@@ -139,11 +147,12 @@ class FeatureCreator:
     """This class keeps computed features in memory
     and returns them when requested"""
 
-    def __init__(self, net_proto, net_weights):
+    def __init__(self, net_proto, net_weights, mean_pixel=None, mean_file=None):
         self.net = get_net(net_weights, net_proto)
-        self.transformer = get_transformer(net_proto)
+        self.transformer = get_transformer(net_proto, mean_pixel=mean_pixel, mean_file=mean_file)
         self.features6 = {}
         self.features7 = {}
+        self.f_size = 4096
 
     def prepare_features(self, image_files):
         _, channels, height, width = self.transformer.inputs['data']
@@ -157,7 +166,7 @@ class FeatureCreator:
                   for image_file in image_files]
         # Classify the image
         (fc6, fc7) = forward_pass(images, self.net,
-                                  self.transformer, batch_size=128)
+                                  self.transformer, batch_size=512)
         i = 0
         # load the features in a map with their path as key
         for f in image_files:
@@ -165,7 +174,15 @@ class FeatureCreator:
             self.features7[f] = fc7[i]
             i += 1
 
-    def get_features(self, image_files):
+    def get_features(self, image_path):
+        feats = self.features7.get(image_path, None)
+        if feats is None:
+            print "Extracting " + image_path
+            self.prepare_features([image_path])
+            feats = self.features7[image_path]
+        return feats
+
+    def get_features_adv(self, image_files):
         fc6 = None
         fc7 = None
         for f in image_files:
