@@ -70,9 +70,10 @@ def get_transformer(deploy_file, mean_file=None, mean_pixel=None):
                 raise ValueError(
                     'blob does not provide shape or 4d dimensions')
             pixel = np.reshape(blob.data, blob_dims[1:]).mean(1).mean(1)
+            print pixel
             t.set_mean('data', pixel)
     if mean_pixel:
-        print "Using mean pixel"
+        print "Using mean pixel %f" % mean_pixel
         t.set_mean('data', np.ones(1) * mean_pixel)
 
     return t
@@ -91,14 +92,25 @@ def load_image(path, height, width, mode='RGB'):
         (RGB for color or L for grayscale)
     """
     image = PIL.Image.open(path)
-    image = image.convert(mode)
-    image = np.array(image)
-    # squash
-    image = scipy.misc.imresize(image, (height, width), 'bilinear')
+    #import pdb; pdb.set_trace()
+    if image.mode == 'I':
+        data = np.array(image.resize([width, height], PIL.Image.BILINEAR))
+        if mode == 'RGB':
+            w, h = data.shape
+            ret = np.empty((w, h, 3), dtype=np.float32)
+            ret[:, :, 2] = ret[:, :, 1] = ret[:, :, 0] = data / 255.0
+            image = ret
+        else:
+            image = data.astype('float32') / 255.0
+    else:
+        image = image.convert(mode)
+        image = np.array(image)
+        # squash
+        image = scipy.misc.imresize(image, (height, width), 'bilinear')
     return image
 
 
-def forward_pass(images, net, transformer, batch_size=None):
+def forward_pass(images, net, transformer, batch_size=None, layer_name='fc7'):
     """
     Returns scores for each image as an np.ndarray (nImages x nClasses)
     Arguments:
@@ -121,8 +133,10 @@ def forward_pass(images, net, transformer, batch_size=None):
 
     dims = transformer.inputs['data'][1:]
 
-    fc6 = fc7 = None
-    todoChunks = [caffe_images[x:x + batch_size] for x in xrange(0, len(caffe_images), batch_size)]
+    # fc6 = None
+    fc7 = None
+    todoChunks = [caffe_images[x:x + batch_size]
+                  for x in xrange(0, len(caffe_images), batch_size)]
     start = time.clock()
     for k, chunk in enumerate(todoChunks):
         print "Processing batch %d out of %d" % (k, len(todoChunks))
@@ -133,26 +147,28 @@ def forward_pass(images, net, transformer, batch_size=None):
             image_data = transformer.preprocess('data', image)
             net.blobs['data'].data[index] = image_data
         net.forward()
-        if fc6 is None:
-            fc6 = net.blobs['fc6'].data
-            fc7 = net.blobs['fc7'].data
+        if fc7 is None:
+            # fc6 = net.blobs['fc6'].data
+            fc7 = net.blobs[layer_name].data
         else:
-            fc6 = np.vstack((fc6, net.blobs['fc6'].data))
-            fc7 = np.vstack((fc7, net.blobs['fc7'].data))
+            # fc6 = np.vstack((fc6, net.blobs['fc6'].data))
+            fc7 = np.vstack((fc7, net.blobs[layer_name].data))
     print "It took %f" % (time.clock() - start)
-    return (fc6, fc7)
+    return (None, fc7)
 
 
 class FeatureCreator:
     """This class keeps computed features in memory
     and returns them when requested"""
 
-    def __init__(self, net_proto, net_weights, mean_pixel=None, mean_file=None):
+    def __init__(self, net_proto, net_weights, mean_pixel=None, mean_file=None, use_gpu=None, layer_name='fc7'):
         self.net = get_net(net_weights, net_proto)
-        self.transformer = get_transformer(net_proto, mean_pixel=mean_pixel, mean_file=mean_file)
-        self.features6 = {}
+        self.transformer = get_transformer(
+            net_proto, mean_pixel=mean_pixel, mean_file=mean_file, use_gpu=use_gpu)
+        # self.features6 = {}
         self.features7 = {}
-        self.f_size = 4096
+        self.f_size = self.net.blobs[self.layer_name].data.shape[1]
+        self.batch_size = 512
 
     def prepare_features(self, image_files):
         _, channels, height, width = self.transformer.inputs['data']
@@ -165,21 +181,20 @@ class FeatureCreator:
         images = [load_image(image_file, height, width, mode)
                   for image_file in image_files]
         # Classify the image
-        (fc6, fc7) = forward_pass(images, self.net,
-                                  self.transformer, batch_size=512)
+        feats = forward_pass(images, self.net,
+                             self.transformer, batch_size=self.batch_size, layer_name=self.layer_name)
         i = 0
         # load the features in a map with their path as key
         for f in image_files:
-            self.features6[f] = fc6[i]
-            self.features7[f] = fc7[i]
+            # self.features6[f] = fc6[i]
+            self.features7[f] = feats[i]
             i += 1
+        self.net = None  # free video memory
 
     def get_features(self, image_path):
         feats = self.features7.get(image_path, None)
         if feats is None:
-            print "Extracting " + image_path
-            self.prepare_features([image_path])
-            feats = self.features7[image_path]
+            print "!!! Missing features for " + image_path
         return feats
 
     def get_features_adv(self, image_files):
