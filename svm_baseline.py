@@ -24,6 +24,7 @@ def get_arguments():
     parser.add_argument("--batch-size", type=int, default=512)
     parser.add_argument("--layer_name", help="Default is FC7", default='fc7')
     parser.add_argument("--use-gpu", type=bool, default=True, help="If set false, will force CPU inference")
+    parser.add_argument("--center_data", type=bool, default=False)
 
     args = parser.parse_args()
     return args
@@ -34,14 +35,14 @@ def run_washington_splits(data_dir, split_dir, f_extractor):
     classes = 51
     f_size = f_extractor.f_size
     preload = None
-    for x in range(1):
+    for x in range(10):
         print "Loading split %d" % x
         train_features = [np.empty((0, f_size)) for n in range(classes)]
         test_features = [np.empty((0, f_size)) for n in range(classes)]
         train_file = open(
-            join(split_dir, 'test_depth_train_split_' + str(x) + '.txt'), 'rt')
+            join(split_dir, 'depth_train_split_' + str(x) + '.txt'), 'rt')
         test_file = open(
-            join(split_dir, 'test_depth_test_split_' + str(x) + '.txt'), 'rt')
+            join(split_dir, 'depth_test_split_' + str(x) + '.txt'), 'rt')
         train_lines = train_file.readlines()
         test_lines = test_file.readlines()
         if preload is None:
@@ -79,6 +80,7 @@ def do_svm(loaded_data):
     print "Fitting SVM to data - train data %s, test data %s" \
         % (str(loaded_data.train_patches.shape), str(loaded_data.test_patches.shape))
     clf = svm.LinearSVC(dual=False)
+    print "Feature mean %f and std %f" % (loaded_data.train_patches.mean(), loaded_data.train_patches.std())
     start = time.clock()
     clf.fit(loaded_data.train_patches, loaded_data.train_labels)
     res = clf.predict(loaded_data.test_patches)
@@ -96,4 +98,5 @@ if __name__ == '__main__':
         args.net_proto, args.net_model, args.mean_pixel, args.mean_file,
         use_gpu=args.use_gpu, layer_name=args.layer_name)
     f_extractor.batch_size = args.batch_size
+    f_extractor.center_data = args.center_data
     run_washington_splits(args.data_dir, args.split_dir, f_extractor)

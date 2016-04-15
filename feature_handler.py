@@ -71,7 +71,6 @@ def get_transformer(deploy_file, mean_file=None, mean_pixel=None):
                     'blob does not provide shape or 4d dimensions')
             pixel = np.reshape(blob.data, blob_dims[1:]).mean(1).mean(1)
             print pixel
-            import pdb; pdb.set_trace()
             t.set_mean('data', pixel)
     if mean_pixel:
         print "Using mean pixel %f" % mean_pixel
@@ -104,13 +103,17 @@ def load_image(path, height, width, mode='RGB'):
             image = ret
         else:
             image = data.astype('float32')
-        #image = image / 64
+        coeff = 255.0 / image.max()
+        image = image * coeff
+        image = image.astype("uint8")
+        image = 4*(image.astype("float32")/coeff)
         #image = (255.0 * image) / image.max()
     else:
         image = image.convert(mode)
         image = np.array(image)
         # squash
         image = scipy.misc.imresize(image, (height, width), 'bilinear')
+        image = image.astype('float32')*8
     return image
 
 
@@ -187,6 +190,14 @@ class FeatureCreator:
             raise ValueError('Invalid number for channels: %s' % channels)
         images = [load_image(image_file, height, width, mode)
                   for image_file in image_files]
+        if self.center_data:
+            mean = 0.0
+            for im in images:
+                mean += im.mean()
+            mean = mean / len(images)
+            self.transformer.set_mean('data', np.ones(self.transformer.inputs['data'][1]) * mean)
+#            import pdb; pdb.set_trace()
+            print "Image mean: %f" % mean
         # Classify the image
         feats = forward_pass(images, self.net,
                              self.transformer, batch_size=self.batch_size, layer_name=self.layer_name)
