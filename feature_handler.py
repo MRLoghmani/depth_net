@@ -71,10 +71,11 @@ def get_transformer(deploy_file, mean_file=None, mean_pixel=None):
                     'blob does not provide shape or 4d dimensions')
             pixel = np.reshape(blob.data, blob_dims[1:]).mean(1).mean(1)
             print pixel
+            import pdb; pdb.set_trace()
             t.set_mean('data', pixel)
     if mean_pixel:
         print "Using mean pixel %f" % mean_pixel
-        t.set_mean('data', np.ones(1) * mean_pixel)
+        t.set_mean('data', np.ones(dims[1]) * mean_pixel)
 
     return t
 
@@ -94,14 +95,17 @@ def load_image(path, height, width, mode='RGB'):
     image = PIL.Image.open(path)
     #import pdb; pdb.set_trace()
     if image.mode == 'I':
+        #print "impossible"
         data = np.array(image.resize([width, height], PIL.Image.BILINEAR))
         if mode == 'RGB':
             w, h = data.shape
             ret = np.empty((w, h, 3), dtype=np.float32)
-            ret[:, :, 2] = ret[:, :, 1] = ret[:, :, 0] = data / 255.0
+            ret[:, :, 2] = ret[:, :, 1] = ret[:, :, 0] = data
             image = ret
         else:
-            image = data.astype('float32') / 255.0
+            image = data.astype('float32')
+        #image = image / 64
+        #image = (255.0 * image) / image.max()
     else:
         image = image.convert(mode)
         image = np.array(image)
@@ -145,6 +149,7 @@ def forward_pass(images, net, transformer, batch_size=None, layer_name='fc7'):
             net.blobs['data'].reshape(*new_shape)
         for index, image in enumerate(chunk):
             image_data = transformer.preprocess('data', image)
+            #import pdb; pdb.set_trace()
             net.blobs['data'].data[index] = image_data
         net.forward()
         if fc7 is None:
@@ -154,7 +159,7 @@ def forward_pass(images, net, transformer, batch_size=None, layer_name='fc7'):
             # fc6 = np.vstack((fc6, net.blobs['fc6'].data))
             fc7 = np.vstack((fc7, net.blobs[layer_name].data))
     print "It took %f" % (time.clock() - start)
-    return (None, fc7)
+    return fc7
 
 
 class FeatureCreator:
@@ -162,15 +167,17 @@ class FeatureCreator:
     and returns them when requested"""
 
     def __init__(self, net_proto, net_weights, mean_pixel=None, mean_file=None, use_gpu=None, layer_name='fc7'):
-        self.net = get_net(net_weights, net_proto)
+        self.net = get_net(net_weights, net_proto, use_gpu=use_gpu)
         self.transformer = get_transformer(
-            net_proto, mean_pixel=mean_pixel, mean_file=mean_file, use_gpu=use_gpu)
+            net_proto, mean_pixel=mean_pixel, mean_file=mean_file)
         # self.features6 = {}
         self.features7 = {}
+        self.layer_name = layer_name
         self.f_size = self.net.blobs[self.layer_name].data.shape[1]
         self.batch_size = 512
 
     def prepare_features(self, image_files):
+        #import pdb; pdb.set_trace()
         _, channels, height, width = self.transformer.inputs['data']
         if channels == 3:
             mode = 'RGB'

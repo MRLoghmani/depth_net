@@ -34,14 +34,14 @@ def run_washington_splits(data_dir, split_dir, f_extractor):
     classes = 51
     f_size = f_extractor.f_size
     preload = None
-    for x in range(10):
+    for x in range(1):
         print "Loading split %d" % x
         train_features = [np.empty((0, f_size)) for n in range(classes)]
         test_features = [np.empty((0, f_size)) for n in range(classes)]
         train_file = open(
-            join(split_dir, 'depth_train_split_' + str(x) + '.txt'), 'rt')
+            join(split_dir, 'test_depth_train_split_' + str(x) + '.txt'), 'rt')
         test_file = open(
-            join(split_dir, 'depth_test_split_' + str(x) + '.txt'), 'rt')
+            join(split_dir, 'test_depth_test_split_' + str(x) + '.txt'), 'rt')
         train_lines = train_file.readlines()
         test_lines = test_file.readlines()
         if preload is None:
