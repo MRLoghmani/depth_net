@@ -1,9 +1,9 @@
-function [ b_subs ] = addBackground( obImg,backgroundImg, show )
+function [ b_subs ] = addBackground(object ,backgroundImg, show )
 b=imread(backgroundImg);
 b=imresize(b,[256 256]);
 maxB=max(max(b));
 b_uint8=uint8(255*double(b)./(double(maxB)));
-object=imread(obImg);
+%object=imread(obImg);
 objectStripped=object;
 objectStripped(objectStripped==255) = 0;
 maxOb=max(max(objectStripped));
