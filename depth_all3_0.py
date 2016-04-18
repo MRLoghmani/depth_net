@@ -128,11 +128,11 @@ output_8bit_png.format.color_depth='8'
 output_8bit_png.format.file_format='PNG'
 
 #Add output 16bit file node
-#output_16bit_png = nodes.new('CompositorNodeOutputFile')
-#output_16bit_png.base_path = png16_path
-#output_16bit_png.format.file_format='PNG'
-#output_16bit_png.format.color_mode='BW'
-#output_16bit_png.format.color_depth='16'
+output_16bit_png = nodes.new('CompositorNodeOutputFile')
+output_16bit_png.base_path = png16_path
+output_16bit_png.format.file_format='PNG'
+output_16bit_png.format.color_mode='BW'
+output_16bit_png.format.color_depth='16'
 
 scene.node_tree.links.new(
         render_layers.outputs['Z'],
@@ -142,10 +142,10 @@ scene.node_tree.links.new(
         norm.outputs['Value'],
         output_8bit_png.inputs[0]
     )
-#scene.node_tree.links.new(
-#        norm.outputs['Value'],
-#        output_16bit_png.inputs[0]
-#    )
+scene.node_tree.links.new(
+        norm.outputs['Value'],
+        output_16bit_png.inputs[0]
+    )
 CoRX=0.0
 CoRY=0.0
 CoR=(CoRX,CoRY,0)
@@ -182,7 +182,7 @@ for size in range(1,4): #size regulates the distance of the camera!
         phi_out = radians(jj*30)
         cam_ob.location = (CoRX + CamDist*cos(phi_out)*sin(theta_out),CoRY + CamDist*sin(phi_out)*sin(theta_out),CamDist*cos(theta_out))  
         str1=category+'_'+file_name+'_%d_%s_' % (counter,str2)
-        #output_16bit_png.file_slots[0].path = str1  
+        output_16bit_png.file_slots[0].path = str1  
         output_8bit_png.file_slots[0].path = str1            
         bpy.ops.render.render(write_still=True, use_viewport=True)
        
