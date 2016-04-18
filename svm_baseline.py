@@ -25,6 +25,7 @@ def get_arguments():
     parser.add_argument("--layer_name", help="Default is FC7", default='fc7')
     parser.add_argument("--use-gpu", type=bool, default=True, help="If set false, will force CPU inference")
     parser.add_argument("--center_data", type=bool, default=False)
+    parser.add_argument("--scale", type=float, default=None)
 
     args = parser.parse_args()
     return args
@@ -99,4 +100,5 @@ if __name__ == '__main__':
         use_gpu=args.use_gpu, layer_name=args.layer_name)
     f_extractor.batch_size = args.batch_size
     f_extractor.center_data = args.center_data
+    f_extractor.set_data_scale(args.scale)
     run_washington_splits(args.data_dir, args.split_dir, f_extractor)

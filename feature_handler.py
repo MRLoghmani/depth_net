@@ -92,7 +92,7 @@ def load_image(path, height, width, mode='RGB'):
         (RGB for color or L for grayscale)
     """
     image = PIL.Image.open(path)
-    #import pdb; pdb.set_trace()
+
     if image.mode == 'I':
         #print "impossible"
         data = np.array(image.resize([width, height], PIL.Image.BILINEAR))
@@ -103,17 +103,11 @@ def load_image(path, height, width, mode='RGB'):
             image = ret
         else:
             image = data.astype('float32')
-        coeff = 255.0 / image.max()
-        image = image * coeff
-        image = image.astype("uint8")
-        image = 4*(image.astype("float32")/coeff)
-        #image = (255.0 * image) / image.max()
     else:
         image = image.convert(mode)
         image = np.array(image)
         # squash
-        image = scipy.misc.imresize(image, (height, width), 'bilinear')
-        image = image.astype('float32')*8
+        image = scipy.misc.imresize(image, (height, width), 'bilinear').astype('float32')
     return image
 
 
@@ -178,6 +172,7 @@ class FeatureCreator:
         self.layer_name = layer_name
         self.f_size = self.net.blobs[self.layer_name].data.shape[1]
         self.batch_size = 512
+        self.scale = 1
 
     def prepare_features(self, image_files):
         #import pdb; pdb.set_trace()
@@ -194,7 +189,7 @@ class FeatureCreator:
             mean = 0.0
             for im in images:
                 mean += im.mean()
-            mean = mean / len(images)
+            mean = self.scale * mean / len(images)
             self.transformer.set_mean('data', np.ones(self.transformer.inputs['data'][1]) * mean)
 #            import pdb; pdb.set_trace()
             print "Image mean: %f" % mean
@@ -214,7 +209,13 @@ class FeatureCreator:
         if feats is None:
             print "!!! Missing features for " + image_path
         return feats
-
+      
+    def set_data_scale(self, scale):
+	if scale is None: return
+	self.transformer.set_raw_scale('data', scale)
+	print "Set transformer raw data scale to %f" % scale
+	self.scale = scale
+	
     def get_features_adv(self, image_files):
         fc6 = None
         fc7 = None
