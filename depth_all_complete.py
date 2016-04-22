@@ -177,7 +177,7 @@ for n in range (1,n_samples+1):
         ob.scale[0] = dimStandardX * (1 + random.random()*0.2 - 0.1)
         ob.scale[1] = dimStandardY * (1 + random.random()*0.2 - 0.1)
         ob.scale[2] = dimStandardZ * (1 + random.random()*0.2 - 0.1)        
-    cam.lens =random.randint(16,100)
+    cam.lens =random.randint(16,95)
     CamDist =(0.4 + random.random()/5)* (CamDistStandard/lensStandard)  * cam.lens  
     theta_out =   radians(random.random()*360)
     phi_out = radians(random.random()*360)
