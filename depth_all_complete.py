@@ -14,6 +14,10 @@ argv = sys.argv
 argv = argv[argv.index("--") + 1:]  # get all args after "--"
 filepath=argv[0]
 output_root_dir=argv[1]
+tag=argv[2]
+n_samples=int(argv[3])
+#import code
+#code.interact(local=locals())
 path=os.path.dirname(filepath)
 categorydir=os.path.basename(os.path.normpath(path))
 
@@ -159,8 +163,7 @@ CoRY=0.0
 CoR=(CoRX,CoRY,0)
 CamStartDist=3.8
 CamDist=0.0#to be sure it is a float!
-counter=700 
-n_samples=120                                         
+counter=0
 axis = None
 angle = 0
 lensStandard=35.0
@@ -182,7 +185,7 @@ for n in range (1,n_samples+1):
     theta_out =   radians(random.random()*360)
     phi_out = radians(random.random()*360)
     cam_ob.location = (CoRX + CamDist*cos(phi_out)*sin(theta_out),CoRY + CamDist*sin(phi_out)*sin(theta_out),CamDist*cos(theta_out))  
-    str1=category+'_'+file_name+'_%d_' % (counter)
+    str1=category+'_'+file_name+'_%d_%s' % (counter, tag)
    # output_16bit_png.file_slots[0].path = str1  
     output_8bit_png.file_slots[0].path = str1            
     bpy.ops.render.render(write_still=True, use_viewport=True)
