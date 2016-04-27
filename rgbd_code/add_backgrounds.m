@@ -13,6 +13,9 @@ for i=1:numel(filelist)
     in = imread(fullfile(source_dir, filelist{i}));
     out1 = fullfile(output_dir1, filelist{i});
     out2 = fullfile(output_dir2, filelist{i});
+    if exist(out2, 'file')
+        continue
+    end
     bg_i = randi(n_bgs);
     add_kinect_background(in, bgs{bg_i}.data, bgs{bg_i}.mean, out1);
     add_flat_background(in, out2);
