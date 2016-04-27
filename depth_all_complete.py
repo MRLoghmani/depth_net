@@ -19,11 +19,11 @@ categorydir=os.path.basename(os.path.normpath(path))
 
 file_name=bpy.path.display_name_from_filepath(filepath) #get the .blend name without extension and path
 
-png16_path = join(output_root_dir, "16bit", categorydir,file_name)
+#png16_path = join(output_root_dir, "16bit", categorydir,file_name)
 png8_path = join(output_root_dir, "8bit", categorydir,file_name)
 category=path.split('/').pop()
-if not os.path.exists(png16_path):
-    os.makedirs(png16_path)
+#if not os.path.exists(png16_path):
+#    os.makedirs(png16_path)
 if not os.path.exists(png8_path):
     os.makedirs(png8_path)
 
@@ -78,11 +78,11 @@ scene.render.resolution_percentage = 100
 ZoomDist=scene.render.resolution_x/256 #value that I need to multiply to Camdist to get the "256px size"
 scene.render.engine = 'CYCLES' # We use the Cycles Render
 scene.render.threads_mode = 'FIXED'
-scene.render.threads = 2
+scene.render.threads = 4
 scene.render.use_local_coords=True
 scene.render.image_settings.color_depth='8'
 scene.render.image_settings.color_mode='BW'
-scene.render.image_settings.compression=0
+scene.render.image_settings.compression=100
 scene.render.use_persistent_data=True
 #import code
 #code.interact(local=locals())
@@ -95,7 +95,7 @@ cycles.min_bounces=0
 cycles.diffuse_bounces=0
 cycles.caustics_reflective=False
 cycles.caustics_refractive=False
-cycles.use_cache=True#increase the performance: a lot!
+#cycles.use_cache=True#increase the performance: a lot!
 
 
 #set a new camera and its target:All meshes!
@@ -159,8 +159,8 @@ CoRY=0.0
 CoR=(CoRX,CoRY,0)
 CamStartDist=3.8
 CamDist=0.0#to be sure it is a float!
-counter=0 
-n_samples=60                                         
+counter=700 
+n_samples=120                                         
 axis = None
 angle = 0
 lensStandard=35.0
@@ -173,10 +173,10 @@ CamDistStandard=ZoomDist*CamStartDist/(size)
 for n in range (1,n_samples+1):
    # size=random.random()*0.6 + 0.9   #1.6 as maximum 
     counter=counter+1   
-    if (n % 10) == 0:
-        ob.scale[0] = dimStandardX * (1 + random.random()*0.2 - 0.1)
-        ob.scale[1] = dimStandardY * (1 + random.random()*0.2 - 0.1)
-        ob.scale[2] = dimStandardZ * (1 + random.random()*0.2 - 0.1)        
+   
+    ob.scale[0] = dimStandardX * (1 + random.random()*0.2 - 0.1)
+    ob.scale[1] = dimStandardY * (1 + random.random()*0.2 - 0.1)
+    ob.scale[2] = dimStandardZ * (1 + random.random()*0.2 - 0.1)        
     cam.lens =random.randint(16,95)
     CamDist =(0.4 + random.random()/5)* (CamDistStandard/lensStandard)  * cam.lens  
     theta_out =   radians(random.random()*360)
