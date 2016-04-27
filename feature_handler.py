@@ -183,16 +183,15 @@ class FeatureCreator:
             mode = 'L'
         else:
             raise ValueError('Invalid number for channels: %s' % channels)
-        images = [load_image(image_file, height, width, mode)
-                  for image_file in image_files]
+        images = [load_image(image_file, height, width, mode) for image_file in image_files]
+	mean = 0.0
+	for im in images:
+	    mean += im.mean()
+	mean = self.scale * mean / len(images)
+	print "Image mean: %f" % mean
         if self.center_data:
-            mean = 0.0
-            for im in images:
-                mean += im.mean()
-            mean = self.scale * mean / len(images)
             self.transformer.set_mean('data', np.ones(self.transformer.inputs['data'][1]) * mean)
-#            import pdb; pdb.set_trace()
-            print "Image mean: %f" % mean
+            print "Will center data"
         # Classify the image
         feats = forward_pass(images, self.net,
                              self.transformer, batch_size=self.batch_size, layer_name=self.layer_name)
