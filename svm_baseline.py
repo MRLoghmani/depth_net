@@ -57,12 +57,12 @@ def run_washington_splits(data_dir, split_dir, f_extractor):
             [path, classLabel] = line.split()
             nClass = int(classLabel)
             train_features[nClass] = np.vstack(
-                [train_features[nClass], f_extractor.get_features(join(data_dir, path))])
+                [train_features[nClass], f_extractor.get_features(join(data_dir, path)).reshape(1, f_extractor.f_size)])
         for line in test_lines:
             [path, classLabel] = line.split()
             nClass = int(classLabel)
             test_features[nClass] = np.vstack(
-                [test_features[nClass], f_extractor.get_features(join(data_dir, path))])
+                [test_features[nClass], f_extractor.get_features(join(data_dir, path)).reshape(1, f_extractor.f_size)])
         train_labels = np.hstack(
             [np.ones(data.shape[0]) * c for c, data in enumerate(train_features)]).ravel()
         test_labels = np.hstack(
