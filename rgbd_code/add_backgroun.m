@@ -4,7 +4,7 @@ out_folder = '/home/enoon/Downloads/toSelect/8BitScenes/background/selected/rend
 bgs = dir(input_folder);
 k=0
 for file = bgs'
-    joined = addBackground(object, strcat('/home/enoon/Downloads/toSelect/8BitScenes/background/selected/',file.name))
+    joined = addBackground(object, strcat('/home/enoon/Downloads/toSelect/8BitScenes/background/selected/',file.name));
     imwrite(joined, strcat('image_',num2str(k),'.png'));
     k = k+1
 end
