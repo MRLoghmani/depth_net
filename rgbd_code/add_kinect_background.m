@@ -11,7 +11,7 @@ function add_kinect_background( img, bg_img, bg_mean, out_path )
     K =  255 - 255 * M;
     b_shifted = uint8(double(bg_img).*M + K);
     img = b_shifted .* uint8(not(obj)) + img .* uint8(obj);
-    imwrite(img, out_path);
+    imwrite(img, strrep(out_path, '.png', '_kinect.png'));
     %imshow(img)
     %waitforbuttonpress
 end
