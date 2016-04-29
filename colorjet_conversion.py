@@ -10,7 +10,7 @@ def get_arguments():
     parser.add_argument("input_dir")
     parser.add_argument("output_dir")
     parser.add_argument("image_list", help="File containing the relative path to each file we want to convert")
-
+    parser.add_argument("--colorjet", type=bool, default=True)
     args = parser.parse_args()
     return args
 
@@ -65,5 +65,6 @@ if __name__ == "__main__":
         img_path = i_path.strip()
         img = cv2.imread(join(input_dir, img_path), -1);
         newimg = scaleit_experimental(img)
-        newimg = cv2.applyColorMap(newimg, cv2.COLORMAP_JET)
+        if args.colorjet:
+            newimg = cv2.applyColorMap(newimg, cv2.COLORMAP_JET)
         cv2.imwrite(join(output_dir, img_path), newimg)
