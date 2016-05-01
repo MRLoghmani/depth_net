@@ -1,4 +1,4 @@
-filelist = textread('Complete5_6list.txt','%s',4000000);
+filelist = textread('Total_list.txt','%s',4000000);
 for i=1:numel(filelist)%
 	imwrite(imread(filelist{i}), filelist{i});
     if mod(i,5000) == 0

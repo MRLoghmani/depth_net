@@ -1,8 +1,8 @@
-filelist = importdata('all_zeus1.txt');
+filelist = importdata('Total2240k_list.txt');
 bg_paths = importdata('all_bgs.txt');
-source_dir = '/home/enoon/DepthNet/Renderings/new_rendering_zeus1';
-output_dir1 = '/home/enoon/DepthNet/Renderings/zeus1_kinect';
-output_dir2 = '/home/enoon/DepthNet/Renderings/zeus1_uniform';
+source_dir = '/home/hades/PNG/Total2240k';
+output_dir1 = '/home/hades/PNG/Backgrounded/Total2240k_kinect';
+output_dir2 = '/home/hades/PNG/Backgrounded/Total2240k_flat';
 bgs = {}; % this contains backgrounds already resized to appropriate size
 for i=1:numel(bg_paths)
     bgs{i}.data = imresize(imread(bg_paths{i}), [256, 256]);
