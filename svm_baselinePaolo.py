@@ -7,6 +7,8 @@ from os.path import join
 import time
 import feature_handler
 from joblib import Parallel, delayed
+import copy as c
+from multiprocessing import Process, Value, Array
 
 LoadedData = namedtuple(
     "LoadedData", "train_patches train_labels test_patches test_labels")
@@ -31,21 +33,42 @@ def get_arguments():
     return args
 
 def run_washington_splits(data_dir, split_dir, f_extractor):
-    splits_acc = []
+    splits_acc = Array('d', range(10))
     classes = 51
     f_size = f_extractor.f_size
     preload = None
     x=0
     all_files=[]
-    (all_files,splits_acc)=run_split(data_dir,split_dir,f_extractor,splits_acc,classes,f_size,preload,all_files,x)   
-    #for x in range (1,10):
-    #    all_files=run_split(data_dir,split_dir,f_extractor,splits_acc,classes,f_size,True,all_files,x)
-    Parallel(n_jobs=3)(delayed(run_split)(data_dir,split_dir,f_extractor,splits_acc,classes,f_size,True,all_files,x) for x in range(1,10))
-    
-    print splits_acc
-    print np.mean(splits_acc)
+    #preparing the features 
+    print "Preparing features..." 
+    train_features = [np.empty((0, f_size)) for n in range(classes)]
+    test_features = [np.empty((0, f_size)) for n in range(classes)]
+    train_file = open(
+        join(split_dir, 'depth_train_split_' + str(0) + '.txt'), 'rt')
+    test_file = open(
+        join(split_dir, 'depth_test_split_' + str(0) + '.txt'), 'rt')
+    train_lines = train_file.readlines()
+    test_lines = test_file.readlines()
+    all_files = [join(data_dir, line.split()[0]) for line in train_lines] + \
+                [join(data_dir, line.split()[0])
+                 for line in test_lines]
+    f_extractor.prepare_features(all_files)
+    jobs = []
+    for i in range(10):
+        p = Process(target=run_split, args=(data_dir,split_dir,f_extractor,splits_acc,classes,f_size,all_files,i))
+        jobs.append(p)
+        p.start()
+    for i in range(10):
+        jobs[i].join()
+#    for i in range(10):
+#        p[i].start()
+#    for i in range(10):
+#        p[i].join()
+    splits_acc2=[i*100 for i in splits_acc]
+    print splits_acc2[:]
+    print np.mean(splits_acc2)
 
-def run_split(data_dir, split_dir, f_extractor,splits_acc,classes,f_size,preload,all_files,x):
+def run_split(data_dir, split_dir, f_extractor,splits_acc,classes,f_size,all_files,x):
     
     print "Loading split %d" % x 
     train_features = [np.empty((0, f_size)) for n in range(classes)]
@@ -56,23 +79,20 @@ def run_split(data_dir, split_dir, f_extractor,splits_acc,classes,f_size,preload
         join(split_dir, 'depth_test_split_' + str(x) + '.txt'), 'rt')
     train_lines = train_file.readlines()
     test_lines = test_file.readlines()
-    if preload is None:
-        all_files = [join(data_dir, line.split()[0]) for line in train_lines] + \
-                    [join(data_dir, line.split()[0])
-                     for line in test_lines]
-        # preload all features so that they are handled in batches
-        f_extractor.prepare_features(all_files)
-        preload = True
-    for line in train_lines:
-        [path, classLabel] = line.split()
-        nClass = int(classLabel)
-        train_features[nClass] = np.vstack(
-            [train_features[nClass], f_extractor.get_features(join(data_dir, path)).reshape(1, f_extractor.f_size)])
-    for line in test_lines:
-        [path, classLabel] = line.split()
-        nClass = int(classLabel)
-        test_features[nClass] = np.vstack(
-            [test_features[nClass], f_extractor.get_features(join(data_dir, path)).reshape(1, f_extractor.f_size)])
+    try:
+        for line in train_lines:
+            [path, classLabel] = line.split()
+            nClass = int(classLabel)
+            train_features[nClass] = np.vstack(
+                [train_features[nClass], f_extractor.get_features(join(data_dir, path)).reshape(1, f_extractor.f_size)])
+    
+        for line in test_lines:
+            [path, classLabel] = line.split()
+            nClass = int(classLabel)
+            test_features[nClass] = np.vstack(
+                [test_features[nClass], f_extractor.get_features(join(data_dir, path)).reshape(1, f_extractor.f_size)])
+    except:
+        print "Unexpected error:", sys.exc_info()[0]
     train_labels = np.hstack(
         [np.ones(data.shape[0]) * c for c, data in enumerate(train_features)]).ravel()
     test_labels = np.hstack(
@@ -80,9 +100,9 @@ def run_split(data_dir, split_dir, f_extractor,splits_acc,classes,f_size,preload
     test_features = np.vstack(test_features)
     train_features = np.vstack(train_features)
     print "Loaded %s train and %s test - starting svm"
-    splits_acc.append(
-        do_svm(LoadedData(train_features, train_labels, test_features, test_labels)))
-    return (all_files,splits_acc)
+    splits_acc[x]=do_svm(LoadedData(train_features, train_labels, test_features, test_labels))
+    #import pdb; pdb.set_trace()
+    return splits_acc
 
 def do_svm(loaded_data):
     #    loaded_data = load_split(args.input_dir, args.train_file, args.test_file)
