@@ -73,7 +73,7 @@ def run_washington_splits(data_dir, split_dir, f_extractor):
         train_features = np.vstack(train_features)
         print "Loaded %s train and %s test - starting svm"
         splits_acc.append(
-            do_svm(LoadedData(train_features, train_labels, test_features, test_labels)), x)
+            do_svm(LoadedData(train_features, train_labels, test_features, test_labels), x))
     print splits_acc
     print np.mean(splits_acc)
 
