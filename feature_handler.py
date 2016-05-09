@@ -92,7 +92,7 @@ def load_image(path, height, width, mode='RGB'):
         (RGB for color or L for grayscale)
     """
     image = PIL.Image.open(path)
-
+#    import pdb; pdb.set_trace()
     if image.mode == 'I':
         #print "impossible"
         data = np.array(image.resize([width, height], PIL.Image.BILINEAR))

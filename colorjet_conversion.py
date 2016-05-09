@@ -21,6 +21,8 @@ def get_arguments():
 # for noise augmentation. Nan values (which we convert to 0 distance) are therefore dark blue and close objects are also blue.
 def scaleit_experimental(img):
     img_mask = (img == 0)
+    if img is None:
+        return None
     istats = ( np.min(img[img>0]),	np.max(img))
     imrange=  1.0-(img.astype('float32')-istats[0])/(istats[1]-istats[0]);
     imrange[img_mask] = 0
@@ -65,6 +67,8 @@ if __name__ == "__main__":
         img_path = i_path.strip()
         img = cv2.imread(join(input_dir, img_path), -1);
         newimg = scaleit_experimental(img)
+        if newimg is None:
+            continue
         if args.colorjet:
             newimg = cv2.applyColorMap(newimg, cv2.COLORMAP_JET)
         cv2.imwrite(join(output_dir, img_path), newimg)

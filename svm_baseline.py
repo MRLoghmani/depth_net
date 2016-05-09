@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from sklearn.metrics import confusion_matrix
 from sklearn import svm
 import numpy as np
 from argparse import ArgumentParser
@@ -26,6 +27,7 @@ def get_arguments():
     parser.add_argument("--use-gpu", type=bool, default=True, help="If set false, will force CPU inference")
     parser.add_argument("--center_data", type=bool, default=False)
     parser.add_argument("--scale", type=float, default=None)
+    parser.add_argument("--conf_name", default='confusion.csv')
 
     args = parser.parse_args()
     return args
@@ -71,12 +73,55 @@ def run_washington_splits(data_dir, split_dir, f_extractor):
         train_features = np.vstack(train_features)
         print "Loaded %s train and %s test - starting svm"
         splits_acc.append(
+            do_svm(LoadedData(train_features, train_labels, test_features, test_labels)), x)
+    print splits_acc
+    print np.mean(splits_acc)
+
+def run_scene_splits(data_dir, split_dir, f_extractor):
+    splits_acc = []
+    classes = 15
+    f_size = f_extractor.f_size
+    preload = None
+    for x in range(1):
+        print "Loading split %d" % x
+        train_features = [np.empty((0, f_size)) for n in range(classes)]
+        test_features = [np.empty((0, f_size)) for n in range(classes)]
+        train_file = open(
+            join(split_dir, 'train.txt'), 'rt')
+        test_file = open(
+            join(split_dir, 'val.txt'), 'rt')
+        train_lines = train_file.readlines()
+        test_lines = test_file.readlines()
+        if preload is None:
+            all_files = [line.split()[0] for line in train_lines] + \
+                        [line.split()[0] for line in test_lines]
+            # preload all features so that they are handled in batches
+            f_extractor.prepare_features(all_files)
+            preload = True
+        for line in train_lines:
+            [path, classLabel] = line.split()
+            nClass = int(classLabel)
+            train_features[nClass] = np.vstack(
+                [train_features[nClass], f_extractor.get_features(join(data_dir, path)).reshape(1, f_extractor.f_size)])
+        for line in test_lines:
+            [path, classLabel] = line.split()
+            nClass = int(classLabel)
+            test_features[nClass] = np.vstack(
+                [test_features[nClass], f_extractor.get_features(join(data_dir, path)).reshape(1, f_extractor.f_size)])
+        train_labels = np.hstack(
+            [np.ones(data.shape[0]) * c for c, data in enumerate(train_features)]).ravel()
+        test_labels = np.hstack(
+            [np.ones(data.shape[0]) * c for c, data in enumerate(test_features)]).ravel()
+        test_features = np.vstack(test_features)
+        train_features = np.vstack(train_features)
+        print "Loaded %s train and %s test - starting svm"
+        splits_acc.append(
             do_svm(LoadedData(train_features, train_labels, test_features, test_labels)))
     print splits_acc
     print np.mean(splits_acc)
 
 
-def do_svm(loaded_data):
+def do_svm(loaded_data, split_n):
     #    loaded_data = load_split(args.input_dir, args.train_file, args.test_file)
     print "Fitting SVM to data - train data %s, test data %s" \
         % (str(loaded_data.train_patches.shape), str(loaded_data.test_patches.shape))
@@ -85,6 +130,8 @@ def do_svm(loaded_data):
     start = time.clock()
     clf.fit(loaded_data.train_patches, loaded_data.train_labels)
     res = clf.predict(loaded_data.test_patches)
+    confusion = confusion_matrix( loaded_data.test_labels, res)
+    np.savetxt(conf_path + '_' + str(split_n) + '.csv', confusion)
     correct = (res == loaded_data.test_labels).sum()
     score = clf.score(loaded_data.test_patches, loaded_data.test_labels)
     end = time.clock()
@@ -101,4 +148,6 @@ if __name__ == '__main__':
     f_extractor.batch_size = args.batch_size
     f_extractor.center_data = args.center_data
     f_extractor.set_data_scale(args.scale)
+    conf_path = args.conf_name
+#    run_scene_splits(args.data_dir, args.split_dir, f_extractor)
     run_washington_splits(args.data_dir, args.split_dir, f_extractor)
