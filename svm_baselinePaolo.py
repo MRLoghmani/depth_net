@@ -54,16 +54,13 @@ def run_washington_splits(data_dir, split_dir, f_extractor):
                  for line in test_lines]
     f_extractor.prepare_features(all_files)
     jobs = []
-    for i in range(10):
-        p = Process(target=run_split, args=(data_dir,split_dir,f_extractor,splits_acc,classes,f_size,all_files,i))
-        jobs.append(p)
-        p.start()
-    for i in range(10):
-        jobs[i].join()
-#    for i in range(10):
-#        p[i].start()
-#    for i in range(10):
-#        p[i].join()
+    for i in range(5):
+        p1 = Process(target=run_split, args=(data_dir,split_dir,f_extractor,splits_acc,classes,f_size,all_files,i*2))
+        p2 = Process(target=run_split, args=(data_dir,split_dir,f_extractor,splits_acc,classes,f_size,all_files,(i*2)+1))
+        p1.start()
+        p2.start()
+        p1.join()
+        p2.join()
     splits_acc2=[i*100 for i in splits_acc]
     print splits_acc2[:]
     print np.mean(splits_acc2)
