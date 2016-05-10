@@ -82,7 +82,7 @@ scene.render.resolution_percentage = 100
 ZoomDist=scene.render.resolution_x/256 #value that I need to multiply to Camdist to get the "256px size"
 scene.render.engine = 'CYCLES' # We use the Cycles Render
 scene.render.threads_mode = 'FIXED'
-scene.render.threads = 4
+scene.render.threads = 2
 scene.render.use_local_coords=True
 scene.render.image_settings.color_depth='8'
 scene.render.image_settings.color_mode='BW'
@@ -173,6 +173,8 @@ dimStandardZ=ob.scale[2]
 size=1
 CamDistStandard=ZoomDist*CamStartDist/(size)
 
+sintheta_out = sin(0.12566370614) #-->pi/4 # radians(random.random()*360)
+cosphi_out = cos(0.12566370614) #--pi/4  #radians(random.random()*360)
 for n in range (1,n_samples+1):
    # size=random.random()*0.6 + 0.9   #1.6 as maximum 
     counter=counter+1   
@@ -182,9 +184,9 @@ for n in range (1,n_samples+1):
     ob.scale[2] = dimStandardZ * (1 + random.random()*0.2 - 0.1)        
     cam.lens =random.randint(16,95)
     CamDist =(0.4 + random.random()/5)* (CamDistStandard/lensStandard)  * cam.lens  
-    theta_out =   radians(random.random()*360)
-    phi_out = radians(random.random()*360)
     cam_ob.location = (CoRX + CamDist*cos(phi_out)*sin(theta_out),CoRY + CamDist*sin(phi_out)*sin(theta_out),CamDist*cos(theta_out))  
+    ob.rotation_euler = (random.random()*360.0,random.random()*360.0,random.random()*360.0)
+
     str1=category+'_'+file_name+'_%d_%s' % (counter, tag)
    # output_16bit_png.file_slots[0].path = str1  
     output_8bit_png.file_slots[0].path = str1            

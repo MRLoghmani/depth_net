@@ -35,7 +35,7 @@ def main(argv):
 	   		#code.interact(local=locals())
 			if extension == '.blend':
 				fullfilepath = "\""+os.path.abspath(os.path.join(root, f))+"\""		
-			   	callstring="/home/poseidon/blender-2.77a-linux-glibc211-x86_64/./blender"+" -b "+fullfilepath+" --python"+" depth_all_complete.py"+ " -- " + fullfilepath + " " + outputdir + " " + tag + " %d" % (n_samples)
+			   	callstring="/home/hades/blender-2.77a-linux-glibc211-x86_64/./blender"+" -b "+fullfilepath+" --python"+" depth_all_complete.py"+ " -- " + fullfilepath + " " + outputdir + " " + tag + " %d" % (n_samples)
 			   	subprocess.call(callstring,shell=True)
 	print("traversed all the tree in: %d ",time.time() - start_time)
 
