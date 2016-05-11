@@ -28,7 +28,7 @@ def get_arguments():
     parser.add_argument("--center_data", type=bool, default=False)
     parser.add_argument("--scale", type=float, default=None)
     parser.add_argument("--conf_name", default='confusion.csv')
-    parser.add_argument("--verbose", default='true')
+    parser.add_argument("--verbose", default=True)
     args = parser.parse_args()
     return args
 
