@@ -111,7 +111,7 @@ def load_image(path, height, width, mode='RGB'):
     return image
 
 
-def forward_pass(images, net, transformer, batch_size=None, layer_name='fc7'):
+def forward_pass(images, net, transformer,verbose, batch_size=None, layer_name='fc7'):
     """
     Returns scores for each image as an np.ndarray (nImages x nClasses)
     Arguments:
@@ -140,7 +140,8 @@ def forward_pass(images, net, transformer, batch_size=None, layer_name='fc7'):
                   for x in xrange(0, len(caffe_images), batch_size)]
     start = time.clock()
     for k, chunk in enumerate(todoChunks):
-        print "Processing batch %d out of %d" % (k, len(todoChunks))
+        if verbose:
+            print "Processing batch %d out of %d" % (k, len(todoChunks))
         new_shape = (len(chunk),) + tuple(dims)
         if net.blobs['data'].data.shape != new_shape:
             net.blobs['data'].reshape(*new_shape)
@@ -174,7 +175,7 @@ class FeatureCreator:
         self.batch_size = 512
         self.scale = 1
 
-    def prepare_features(self, image_files):
+    def prepare_features(self, image_files,verbose):
         #import pdb; pdb.set_trace()
         _, channels, height, width = self.transformer.inputs['data']
         if channels == 3:
@@ -194,7 +195,7 @@ class FeatureCreator:
             print "Will center data"
         # Classify the image
         feats = forward_pass(images, self.net,
-                             self.transformer, batch_size=self.batch_size, layer_name=self.layer_name)
+                             self.transformer,verbose, batch_size=self.batch_size, layer_name=self.layer_name)
         i = 0
         # load the features in a map with their path as key
         for f in image_files:
