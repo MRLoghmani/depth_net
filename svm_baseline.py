@@ -33,7 +33,7 @@ def get_arguments():
     return args
 
 
-def run_washington_splits(data_dir, split_dir, f_extractor,verbose):
+def run_washington_splits(data_dir, split_dir, f_extractor):
     splits_acc = []
     classes = 51
     f_size = f_extractor.f_size
@@ -53,7 +53,7 @@ def run_washington_splits(data_dir, split_dir, f_extractor,verbose):
                         [join(data_dir, line.split()[0])
                          for line in test_lines]
             # preload all features so that they are handled in batches
-            f_extractor.prepare_features(all_files,verbose)
+            f_extractor.prepare_features(all_files)
             preload = True
         for line in train_lines:
             [path, classLabel] = line.split()
@@ -144,10 +144,10 @@ if __name__ == '__main__':
     args = get_arguments()
     f_extractor = feature_handler.FeatureCreator(
         args.net_proto, args.net_model, args.mean_pixel, args.mean_file,
-        use_gpu=args.use_gpu, layer_name=args.layer_name)
+        use_gpu=args.use_gpu, layer_name=args.layer_name, verbose=args.verbose)
     f_extractor.batch_size = args.batch_size
     f_extractor.center_data = args.center_data
     f_extractor.set_data_scale(args.scale)
     conf_path = args.conf_name
 #    run_scene_splits(args.data_dir, args.split_dir, f_extractor)
-    run_washington_splits(args.data_dir, args.split_dir, f_extractor,args.verbose)
+    run_washington_splits(args.data_dir, args.split_dir, f_extractor)

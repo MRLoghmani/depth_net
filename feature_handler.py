@@ -140,7 +140,7 @@ def forward_pass(images, net, transformer,verbose, batch_size=None, layer_name='
                   for x in xrange(0, len(caffe_images), batch_size)]
     start = time.clock()
     for k, chunk in enumerate(todoChunks):
-        if verbose:
+        if verbose == True:
             print "Processing batch %d out of %d" % (k, len(todoChunks))
         new_shape = (len(chunk),) + tuple(dims)
         if net.blobs['data'].data.shape != new_shape:
@@ -164,7 +164,7 @@ class FeatureCreator:
     """This class keeps computed features in memory
     and returns them when requested"""
 
-    def __init__(self, net_proto, net_weights, mean_pixel=None, mean_file=None, use_gpu=None, layer_name='fc7'):
+    def __init__(self, net_proto, net_weights, mean_pixel=None, mean_file=None, use_gpu=None, layer_name='fc7', verbose=True):
         self.net = get_net(net_weights, net_proto, use_gpu=use_gpu)
         self.transformer = get_transformer(
             net_proto, mean_pixel=mean_pixel, mean_file=mean_file)
@@ -174,8 +174,9 @@ class FeatureCreator:
         self.f_size = self.net.blobs[self.layer_name].data.shape[1]
         self.batch_size = 512
         self.scale = 1
+        self.verbose = verbose
 
-    def prepare_features(self, image_files,verbose):
+    def prepare_features(self, image_files):
         #import pdb; pdb.set_trace()
         _, channels, height, width = self.transformer.inputs['data']
         if channels == 3:
@@ -195,7 +196,7 @@ class FeatureCreator:
             print "Will center data"
         # Classify the image
         feats = forward_pass(images, self.net,
-                             self.transformer,verbose, batch_size=self.batch_size, layer_name=self.layer_name)
+                             self.transformer,self.verbose, batch_size=self.batch_size, layer_name=self.layer_name)
         i = 0
         # load the features in a map with their path as key
         for f in image_files:
