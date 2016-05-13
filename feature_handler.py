@@ -140,8 +140,8 @@ def forward_pass(images, net, transformer,verbose, batch_size=None, layer_name='
                   for x in xrange(0, len(caffe_images), batch_size)]
     start = time.clock()
     for k, chunk in enumerate(todoChunks):
-        if verbose == True:
-            print "Processing batch %d out of %d" % (k, len(todoChunks))
+#        if verbose == True:
+#            print "Processing batch %d out of %d" % (k, len(todoChunks))
         new_shape = (len(chunk),) + tuple(dims)
         if net.blobs['data'].data.shape != new_shape:
             net.blobs['data'].reshape(*new_shape)
@@ -164,7 +164,7 @@ class FeatureCreator:
     """This class keeps computed features in memory
     and returns them when requested"""
 
-    def __init__(self, net_proto, net_weights, mean_pixel=None, mean_file=None, use_gpu=None, layer_name='fc7', verbose=True):
+    def __init__(self, net_proto, net_weights, mean_pixel=None, mean_file=None, use_gpu=None, layer_name='fc7', verbose=False):
         self.net = get_net(net_weights, net_proto, use_gpu=use_gpu)
         self.transformer = get_transformer(
             net_proto, mean_pixel=mean_pixel, mean_file=mean_file)

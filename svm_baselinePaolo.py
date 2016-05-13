@@ -28,7 +28,7 @@ def get_arguments():
     parser.add_argument("--use-gpu", type=bool, default=True, help="If set false, will force CPU inference")
     parser.add_argument("--center_data", type=bool, default=False)
     parser.add_argument("--scale", type=float, default=None)
-
+    parser.add_argument("--verbose", type=bool, default = False)
     args = parser.parse_args()
     return args
 
@@ -52,6 +52,7 @@ def run_washington_splits(data_dir, split_dir, f_extractor):
     all_files = [join(data_dir, line.split()[0]) for line in train_lines] + \
                 [join(data_dir, line.split()[0])
                  for line in test_lines]
+    print f_extractor.verbose
     f_extractor.prepare_features(all_files)
     jobs = []
     for i in range(5):
@@ -119,11 +120,14 @@ def do_svm(loaded_data):
 
 
 if __name__ == '__main__':
+    start_time = time.time()
     args = get_arguments()
     f_extractor = feature_handler.FeatureCreator(
         args.net_proto, args.net_model, args.mean_pixel, args.mean_file,
-        use_gpu=args.use_gpu, layer_name=args.layer_name)
+        use_gpu=args.use_gpu, layer_name=args.layer_name, verbose=args.verbose)
     f_extractor.batch_size = args.batch_size
     f_extractor.center_data = args.center_data
     f_extractor.set_data_scale(args.scale)
     run_washington_splits(args.data_dir, args.split_dir, f_extractor)
+    elapsed_time = time.time() - start_time
+    print "Total elapsed time: %d " % elapsed_time 

@@ -141,6 +141,7 @@ def do_svm(loaded_data, split_n):
 
 
 if __name__ == '__main__':
+    start_time = time.time()
     args = get_arguments()
     f_extractor = feature_handler.FeatureCreator(
         args.net_proto, args.net_model, args.mean_pixel, args.mean_file,
@@ -151,3 +152,5 @@ if __name__ == '__main__':
     conf_path = args.conf_name
 #    run_scene_splits(args.data_dir, args.split_dir, f_extractor)
     run_washington_splits(args.data_dir, args.split_dir, f_extractor)
+    elapsed_time = time.time() - start_time
+    print " Total elapsed time: %d " % elapsed_time
