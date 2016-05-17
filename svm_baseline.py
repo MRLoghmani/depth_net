@@ -24,11 +24,10 @@ def get_arguments():
     parser.add_argument("--mean_file")
     parser.add_argument("--batch-size", type=int, default=512)
     parser.add_argument("--layer_name", help="Default is FC7", default='fc7')
-    parser.add_argument("--use-gpu", type=bool, default=True, help="If set false, will force CPU inference")
+    parser.add_argument("--use_gpu", default=True, help="If set false, will force CPU inference")
     parser.add_argument("--center_data", type=bool, default=False)
     parser.add_argument("--scale", type=float, default=None)
     parser.add_argument("--conf_name", default='confusion.csv')
-    parser.add_argument("--verbose", default=True)
     args = parser.parse_args()
     return args
 
@@ -143,9 +142,10 @@ def do_svm(loaded_data, split_n):
 if __name__ == '__main__':
     start_time = time.time()
     args = get_arguments()
+    print "in main, args.use_gpu= %s" % args.use_gpu
     f_extractor = feature_handler.FeatureCreator(
-        args.net_proto, args.net_model, args.mean_pixel, args.mean_file,
-        use_gpu=args.use_gpu, layer_name=args.layer_name, verbose=args.verbose)
+        args.net_proto, args.net_model,args.use_gpu, args.mean_pixel, args.mean_file,
+         layer_name=args.layer_name)
     f_extractor.batch_size = args.batch_size
     f_extractor.center_data = args.center_data
     f_extractor.set_data_scale(args.scale)

@@ -8,12 +8,11 @@ layer {
   }
   transform_param {
     mirror: true
-    crop_size: 231
+    crop_size: 235
     mean_value: 128
   }
   data_param {
-    batch_size: 128
-    backend: LMDB
+    batch_size: 50
   }
 }
 layer {
@@ -26,7 +25,7 @@ layer {
   }
   transform_param {
     mirror: false
-    crop_size: 231
+    crop_size: 235
     mean_value: 128
 
   }
@@ -67,19 +66,36 @@ layer {
   type: "BatchNorm"
   bottom: "conv1_3x3_s2"
   top: "conv1_3x3_s2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "conv1_3x3_s2_scale"
-  type: "Scale"
-  bottom: "conv1_3x3_s2"
-  top: "conv1_3x3_s2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "conv1_3x3_s2_relu"
   type: "ReLU"
@@ -119,19 +135,36 @@ layer {
   type: "BatchNorm"
   bottom: "conv2_3x3_s1"
   top: "conv2_3x3_s1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "conv2_3x3_s1_scale"
-  type: "Scale"
-  bottom: "conv2_3x3_s1"
-  top: "conv2_3x3_s1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "conv2_3x3_s1_relu"
   type: "ReLU"
@@ -171,17 +204,33 @@ layer {
   type: "BatchNorm"
   bottom: "conv3_3x3_s1"
   top: "conv3_3x3_s1"
-  batch_norm_param {
-    use_global_stats: false
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
   }
-}
-layer {
-  name: "conv3_3x3_s1_scale"
-  type: "Scale"
-  bottom: "conv3_3x3_s1"
-  top: "conv3_3x3_s1"
-  scale_param {
-    bias_term: true
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
 layer {
@@ -223,17 +272,33 @@ layer {
   type: "BatchNorm"
   bottom: "inception_stem1_3x3_s2"
   top: "inception_stem1_3x3_s2"
-  batch_norm_param {
-    use_global_stats: false
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
   }
-}
-layer {
-  name: "inception_stem1_3x3_s2_scale"
-  type: "Scale"
-  bottom: "inception_stem1_3x3_s2"
-  top: "inception_stem1_3x3_s2"
-  scale_param {
-    bias_term: true
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
 layer {
@@ -293,17 +358,33 @@ layer {
   type: "BatchNorm"
   bottom: "inception_stem2_3x3_reduce"
   top: "inception_stem2_3x3_reduce"
-  batch_norm_param {
-    use_global_stats: false
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
   }
-}
-layer {
-  name: "inception_stem2_3x3_reduce_scale"
-  type: "Scale"
-  bottom: "inception_stem2_3x3_reduce"
-  top: "inception_stem2_3x3_reduce"
-  scale_param {
-    bias_term: true
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
 layer {
@@ -345,17 +426,33 @@ layer {
   type: "BatchNorm"
   bottom: "inception_stem2_3x3"
   top: "inception_stem2_3x3"
-  batch_norm_param {
-    use_global_stats: false
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
   }
-}
-layer {
-  name: "inception_stem2_3x3_scale"
-  type: "Scale"
-  bottom: "inception_stem2_3x3"
-  top: "inception_stem2_3x3"
-  scale_param {
-    bias_term: true
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
 layer {
@@ -397,17 +494,33 @@ layer {
   type: "BatchNorm"
   bottom: "inception_stem2_7x1_reduce"
   top: "inception_stem2_7x1_reduce"
-  batch_norm_param {
-    use_global_stats: false
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
   }
-}
-layer {
-  name: "inception_stem2_7x1_reduce_scale"
-  type: "Scale"
-  bottom: "inception_stem2_7x1_reduce"
-  top: "inception_stem2_7x1_reduce"
-  scale_param {
-    bias_term: true
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
 layer {
@@ -451,17 +564,33 @@ layer {
   type: "BatchNorm"
   bottom: "inception_stem2_7x1"
   top: "inception_stem2_7x1"
-  batch_norm_param {
-    use_global_stats: false
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
   }
-}
-layer {
-  name: "inception_stem2_7x1_scale"
-  type: "Scale"
-  bottom: "inception_stem2_7x1"
-  top: "inception_stem2_7x1"
-  scale_param {
-    bias_term: true
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
 layer {
@@ -505,17 +634,33 @@ layer {
   type: "BatchNorm"
   bottom: "inception_stem2_1x7"
   top: "inception_stem2_1x7"
-  batch_norm_param {
-    use_global_stats: false
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
   }
-}
-layer {
-  name: "inception_stem2_1x7_scale"
-  type: "Scale"
-  bottom: "inception_stem2_1x7"
-  top: "inception_stem2_1x7"
-  scale_param {
-    bias_term: true
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
 layer {
@@ -557,17 +702,33 @@ layer {
   type: "BatchNorm"
   bottom: "inception_stem2_3x3_2"
   top: "inception_stem2_3x3_2"
-  batch_norm_param {
-    use_global_stats: false
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
   }
-}
-layer {
-  name: "inception_stem2_3x3_2_scale"
-  type: "Scale"
-  bottom: "inception_stem2_3x3_2"
-  top: "inception_stem2_3x3_2"
-  scale_param {
-    bias_term: true
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
 layer {
@@ -616,17 +777,33 @@ layer {
   type: "BatchNorm"
   bottom: "inception_stem3_3x3_s2"
   top: "inception_stem3_3x3_s2"
-  batch_norm_param {
-    use_global_stats: false
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
   }
-}
-layer {
-  name: "inception_stem3_3x3_s2_scale"
-  type: "Scale"
-  bottom: "inception_stem3_3x3_s2"
-  top: "inception_stem3_3x3_s2"
-  scale_param {
-    bias_term: true
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
 layer {
@@ -698,17 +875,33 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a1_1x1"
   top: "inception_a1_1x1"
-  batch_norm_param {
-    use_global_stats: false
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
   }
-}
-layer {
-  name: "inception_a1_1x1_scale"
-  type: "Scale"
-  bottom: "inception_a1_1x1"
-  top: "inception_a1_1x1"
-  scale_param {
-    bias_term: true
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
 layer {
@@ -750,19 +943,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a1_1x1_2"
   top: "inception_a1_1x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a1_1x1_2_scale"
-  type: "Scale"
-  bottom: "inception_a1_1x1_2"
-  top: "inception_a1_1x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a1_1x1_2_relu"
   type: "ReLU"
@@ -802,19 +1012,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a1_3x3_reduce"
   top: "inception_a1_3x3_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a1_3x3_reduce_scale"
-  type: "Scale"
-  bottom: "inception_a1_3x3_reduce"
-  top: "inception_a1_3x3_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a1_3x3_reduce_relu"
   type: "ReLU"
@@ -854,19 +1081,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a1_3x3"
   top: "inception_a1_3x3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a1_3x3_scale"
-  type: "Scale"
-  bottom: "inception_a1_3x3"
-  top: "inception_a1_3x3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a1_3x3_relu"
   type: "ReLU"
@@ -906,19 +1150,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a1_3x3_2_reduce"
   top: "inception_a1_3x3_2_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a1_3x3_2_reduce_scale"
-  type: "Scale"
-  bottom: "inception_a1_3x3_2_reduce"
-  top: "inception_a1_3x3_2_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a1_3x3_2_reduce_relu"
   type: "ReLU"
@@ -958,19 +1219,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a1_3x3_2"
   top: "inception_a1_3x3_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a1_3x3_2_scale"
-  type: "Scale"
-  bottom: "inception_a1_3x3_2"
-  top: "inception_a1_3x3_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a1_3x3_2_relu"
   type: "ReLU"
@@ -1010,19 +1288,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a1_3x3_3"
   top: "inception_a1_3x3_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a1_3x3_3_scale"
-  type: "Scale"
-  bottom: "inception_a1_3x3_3"
-  top: "inception_a1_3x3_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a1_3x3_3_relu"
   type: "ReLU"
@@ -1083,19 +1378,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a2_1x1"
   top: "inception_a2_1x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a2_1x1_scale"
-  type: "Scale"
-  bottom: "inception_a2_1x1"
-  top: "inception_a2_1x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a2_1x1_relu"
   type: "ReLU"
@@ -1135,19 +1447,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a2_1x1_2"
   top: "inception_a2_1x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a2_1x1_2_scale"
-  type: "Scale"
-  bottom: "inception_a2_1x1_2"
-  top: "inception_a2_1x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a2_1x1_2_relu"
   type: "ReLU"
@@ -1187,19 +1516,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a2_3x3_reduce"
   top: "inception_a2_3x3_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a2_3x3_reduce_scale"
-  type: "Scale"
-  bottom: "inception_a2_3x3_reduce"
-  top: "inception_a2_3x3_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a2_3x3_reduce_relu"
   type: "ReLU"
@@ -1239,19 +1585,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a2_3x3"
   top: "inception_a2_3x3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a2_3x3_scale"
-  type: "Scale"
-  bottom: "inception_a2_3x3"
-  top: "inception_a2_3x3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a2_3x3_relu"
   type: "ReLU"
@@ -1291,19 +1654,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a2_3x3_2_reduce"
   top: "inception_a2_3x3_2_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a2_3x3_2_reduce_scale"
-  type: "Scale"
-  bottom: "inception_a2_3x3_2_reduce"
-  top: "inception_a2_3x3_2_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a2_3x3_2_reduce_relu"
   type: "ReLU"
@@ -1343,19 +1723,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a2_3x3_2"
   top: "inception_a2_3x3_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a2_3x3_2_scale"
-  type: "Scale"
-  bottom: "inception_a2_3x3_2"
-  top: "inception_a2_3x3_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a2_3x3_2_relu"
   type: "ReLU"
@@ -1395,19 +1792,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a2_3x3_3"
   top: "inception_a2_3x3_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a2_3x3_3_scale"
-  type: "Scale"
-  bottom: "inception_a2_3x3_3"
-  top: "inception_a2_3x3_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a2_3x3_3_relu"
   type: "ReLU"
@@ -1468,19 +1882,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a3_1x1"
   top: "inception_a3_1x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a3_1x1_scale"
-  type: "Scale"
-  bottom: "inception_a3_1x1"
-  top: "inception_a3_1x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a3_1x1_relu"
   type: "ReLU"
@@ -1520,19 +1951,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a3_1x1_2"
   top: "inception_a3_1x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a3_1x1_2_scale"
-  type: "Scale"
-  bottom: "inception_a3_1x1_2"
-  top: "inception_a3_1x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a3_1x1_2_relu"
   type: "ReLU"
@@ -1572,19 +2020,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a3_3x3_reduce"
   top: "inception_a3_3x3_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a3_3x3_reduce_scale"
-  type: "Scale"
-  bottom: "inception_a3_3x3_reduce"
-  top: "inception_a3_3x3_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a3_3x3_reduce_relu"
   type: "ReLU"
@@ -1624,19 +2089,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a3_3x3"
   top: "inception_a3_3x3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a3_3x3_scale"
-  type: "Scale"
-  bottom: "inception_a3_3x3"
-  top: "inception_a3_3x3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a3_3x3_relu"
   type: "ReLU"
@@ -1676,19 +2158,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a3_3x3_2_reduce"
   top: "inception_a3_3x3_2_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a3_3x3_2_reduce_scale"
-  type: "Scale"
-  bottom: "inception_a3_3x3_2_reduce"
-  top: "inception_a3_3x3_2_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a3_3x3_2_reduce_relu"
   type: "ReLU"
@@ -1728,19 +2227,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a3_3x3_2"
   top: "inception_a3_3x3_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a3_3x3_2_scale"
-  type: "Scale"
-  bottom: "inception_a3_3x3_2"
-  top: "inception_a3_3x3_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a3_3x3_2_relu"
   type: "ReLU"
@@ -1780,19 +2296,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a3_3x3_3"
   top: "inception_a3_3x3_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a3_3x3_3_scale"
-  type: "Scale"
-  bottom: "inception_a3_3x3_3"
-  top: "inception_a3_3x3_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a3_3x3_3_relu"
   type: "ReLU"
@@ -1853,17 +2386,33 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a4_1x1"
   top: "inception_a4_1x1"
-  batch_norm_param {
-    use_global_stats: false
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
   }
-}
-layer {
-  name: "inception_a4_1x1_scale"
-  type: "Scale"
-  bottom: "inception_a4_1x1"
-  top: "inception_a4_1x1"
-  scale_param {
-    bias_term: true
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
 layer {
@@ -1905,19 +2454,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a4_1x1_2"
   top: "inception_a4_1x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a4_1x1_2_scale"
-  type: "Scale"
-  bottom: "inception_a4_1x1_2"
-  top: "inception_a4_1x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a4_1x1_2_relu"
   type: "ReLU"
@@ -1957,19 +2523,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a4_3x3_reduce"
   top: "inception_a4_3x3_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a4_3x3_reduce_scale"
-  type: "Scale"
-  bottom: "inception_a4_3x3_reduce"
-  top: "inception_a4_3x3_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a4_3x3_reduce_relu"
   type: "ReLU"
@@ -2009,19 +2592,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a4_3x3"
   top: "inception_a4_3x3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a4_3x3_scale"
-  type: "Scale"
-  bottom: "inception_a4_3x3"
-  top: "inception_a4_3x3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a4_3x3_relu"
   type: "ReLU"
@@ -2061,19 +2661,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a4_3x3_2_reduce"
   top: "inception_a4_3x3_2_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a4_3x3_2_reduce_scale"
-  type: "Scale"
-  bottom: "inception_a4_3x3_2_reduce"
-  top: "inception_a4_3x3_2_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a4_3x3_2_reduce_relu"
   type: "ReLU"
@@ -2113,19 +2730,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a4_3x3_2"
   top: "inception_a4_3x3_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a4_3x3_2_scale"
-  type: "Scale"
-  bottom: "inception_a4_3x3_2"
-  top: "inception_a4_3x3_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a4_3x3_2_relu"
   type: "ReLU"
@@ -2165,19 +2799,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_a4_3x3_3"
   top: "inception_a4_3x3_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_a4_3x3_3_scale"
-  type: "Scale"
-  bottom: "inception_a4_3x3_3"
-  top: "inception_a4_3x3_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_a4_3x3_3_relu"
   type: "ReLU"
@@ -2237,19 +2888,36 @@ layer {
   type: "BatchNorm"
   bottom: "reduction_a_3x3"
   top: "reduction_a_3x3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "reduction_a_3x3_scale"
-  type: "Scale"
-  bottom: "reduction_a_3x3"
-  top: "reduction_a_3x3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "reduction_a_3x3_relu"
   type: "ReLU"
@@ -2289,19 +2957,36 @@ layer {
   type: "BatchNorm"
   bottom: "reduction_a_3x3_2_reduce"
   top: "reduction_a_3x3_2_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "reduction_a_3x3_2_reduce_scale"
-  type: "Scale"
-  bottom: "reduction_a_3x3_2_reduce"
-  top: "reduction_a_3x3_2_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "reduction_a_3x3_2_reduce_relu"
   type: "ReLU"
@@ -2341,19 +3026,36 @@ layer {
   type: "BatchNorm"
   bottom: "reduction_a_3x3_2"
   top: "reduction_a_3x3_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "reduction_a_3x3_2_scale"
-  type: "Scale"
-  bottom: "reduction_a_3x3_2"
-  top: "reduction_a_3x3_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "reduction_a_3x3_2_relu"
   type: "ReLU"
@@ -2393,19 +3095,36 @@ layer {
   type: "BatchNorm"
   bottom: "reduction_a_3x3_3"
   top: "reduction_a_3x3_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "reduction_a_3x3_3_scale"
-  type: "Scale"
-  bottom: "reduction_a_3x3_3"
-  top: "reduction_a_3x3_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "reduction_a_3x3_3_relu"
   type: "ReLU"
@@ -2465,19 +3184,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b1_1x1"
   top: "inception_b1_1x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b1_1x1_scale"
-  type: "Scale"
-  bottom: "inception_b1_1x1"
-  top: "inception_b1_1x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b1_1x1_relu"
   type: "ReLU"
@@ -2517,19 +3253,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b1_1x1_2"
   top: "inception_b1_1x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b1_1x1_2_scale"
-  type: "Scale"
-  bottom: "inception_b1_1x1_2"
-  top: "inception_b1_1x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b1_1x1_2_relu"
   type: "ReLU"
@@ -2569,19 +3322,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b1_1x7_reduce"
   top: "inception_b1_1x7_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b1_1x7_reduce_scale"
-  type: "Scale"
-  bottom: "inception_b1_1x7_reduce"
-  top: "inception_b1_1x7_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b1_1x7_reduce_relu"
   type: "ReLU"
@@ -2623,19 +3393,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b1_1x7"
   top: "inception_b1_1x7"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b1_1x7_scale"
-  type: "Scale"
-  bottom: "inception_b1_1x7"
-  top: "inception_b1_1x7"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b1_1x7_relu"
   type: "ReLU"
@@ -2677,19 +3464,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b1_7x1"
   top: "inception_b1_7x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b1_7x1_scale"
-  type: "Scale"
-  bottom: "inception_b1_7x1"
-  top: "inception_b1_7x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b1_7x1_relu"
   type: "ReLU"
@@ -2729,19 +3533,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b1_1x7_2_reduce"
   top: "inception_b1_1x7_2_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b1_1x7_2_reduce_scale"
-  type: "Scale"
-  bottom: "inception_b1_1x7_2_reduce"
-  top: "inception_b1_1x7_2_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b1_1x7_2_reduce_relu"
   type: "ReLU"
@@ -2783,19 +3604,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b1_1x7_2"
   top: "inception_b1_1x7_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b1_1x7_2_scale"
-  type: "Scale"
-  bottom: "inception_b1_1x7_2"
-  top: "inception_b1_1x7_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b1_1x7_2_relu"
   type: "ReLU"
@@ -2837,19 +3675,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b1_7x1_2"
   top: "inception_b1_7x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b1_7x1_2_scale"
-  type: "Scale"
-  bottom: "inception_b1_7x1_2"
-  top: "inception_b1_7x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b1_7x1_2_relu"
   type: "ReLU"
@@ -2891,19 +3746,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b1_1x7_3"
   top: "inception_b1_1x7_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b1_1x7_3_scale"
-  type: "Scale"
-  bottom: "inception_b1_1x7_3"
-  top: "inception_b1_1x7_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b1_1x7_3_relu"
   type: "ReLU"
@@ -2945,19 +3817,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b1_7x1_3"
   top: "inception_b1_7x1_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b1_7x1_3_scale"
-  type: "Scale"
-  bottom: "inception_b1_7x1_3"
-  top: "inception_b1_7x1_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b1_7x1_3_relu"
   type: "ReLU"
@@ -3018,19 +3907,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b2_1x1"
   top: "inception_b2_1x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b2_1x1_scale"
-  type: "Scale"
-  bottom: "inception_b2_1x1"
-  top: "inception_b2_1x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b2_1x1_relu"
   type: "ReLU"
@@ -3070,19 +3976,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b2_1x1_2"
   top: "inception_b2_1x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b2_1x1_2_scale"
-  type: "Scale"
-  bottom: "inception_b2_1x1_2"
-  top: "inception_b2_1x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b2_1x1_2_relu"
   type: "ReLU"
@@ -3122,19 +4045,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b2_1x7_reduce"
   top: "inception_b2_1x7_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b2_1x7_reduce_scale"
-  type: "Scale"
-  bottom: "inception_b2_1x7_reduce"
-  top: "inception_b2_1x7_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b2_1x7_reduce_relu"
   type: "ReLU"
@@ -3176,19 +4116,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b2_1x7"
   top: "inception_b2_1x7"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b2_1x7_scale"
-  type: "Scale"
-  bottom: "inception_b2_1x7"
-  top: "inception_b2_1x7"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b2_1x7_relu"
   type: "ReLU"
@@ -3230,19 +4187,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b2_7x1"
   top: "inception_b2_7x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b2_7x1_scale"
-  type: "Scale"
-  bottom: "inception_b2_7x1"
-  top: "inception_b2_7x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b2_7x1_relu"
   type: "ReLU"
@@ -3282,19 +4256,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b2_1x7_2_reduce"
   top: "inception_b2_1x7_2_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b2_1x7_2_reduce_scale"
-  type: "Scale"
-  bottom: "inception_b2_1x7_2_reduce"
-  top: "inception_b2_1x7_2_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b2_1x7_2_reduce_relu"
   type: "ReLU"
@@ -3336,19 +4327,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b2_1x7_2"
   top: "inception_b2_1x7_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b2_1x7_2_scale"
-  type: "Scale"
-  bottom: "inception_b2_1x7_2"
-  top: "inception_b2_1x7_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b2_1x7_2_relu"
   type: "ReLU"
@@ -3390,19 +4398,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b2_7x1_2"
   top: "inception_b2_7x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b2_7x1_2_scale"
-  type: "Scale"
-  bottom: "inception_b2_7x1_2"
-  top: "inception_b2_7x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b2_7x1_2_relu"
   type: "ReLU"
@@ -3444,19 +4469,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b2_1x7_3"
   top: "inception_b2_1x7_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b2_1x7_3_scale"
-  type: "Scale"
-  bottom: "inception_b2_1x7_3"
-  top: "inception_b2_1x7_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b2_1x7_3_relu"
   type: "ReLU"
@@ -3498,17 +4540,33 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b2_7x1_3"
   top: "inception_b2_7x1_3"
-  batch_norm_param {
-    use_global_stats: false
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
   }
-}
-layer {
-  name: "inception_b2_7x1_3_scale"
-  type: "Scale"
-  bottom: "inception_b2_7x1_3"
-  top: "inception_b2_7x1_3"
-  scale_param {
-    bias_term: true
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
 layer {
@@ -3571,19 +4629,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b3_1x1"
   top: "inception_b3_1x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b3_1x1_scale"
-  type: "Scale"
-  bottom: "inception_b3_1x1"
-  top: "inception_b3_1x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b3_1x1_relu"
   type: "ReLU"
@@ -3623,19 +4698,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b3_1x1_2"
   top: "inception_b3_1x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b3_1x1_2_scale"
-  type: "Scale"
-  bottom: "inception_b3_1x1_2"
-  top: "inception_b3_1x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b3_1x1_2_relu"
   type: "ReLU"
@@ -3675,19 +4767,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b3_1x7_reduce"
   top: "inception_b3_1x7_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b3_1x7_reduce_scale"
-  type: "Scale"
-  bottom: "inception_b3_1x7_reduce"
-  top: "inception_b3_1x7_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b3_1x7_reduce_relu"
   type: "ReLU"
@@ -3729,19 +4838,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b3_1x7"
   top: "inception_b3_1x7"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b3_1x7_scale"
-  type: "Scale"
-  bottom: "inception_b3_1x7"
-  top: "inception_b3_1x7"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b3_1x7_relu"
   type: "ReLU"
@@ -3783,19 +4909,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b3_7x1"
   top: "inception_b3_7x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b3_7x1_scale"
-  type: "Scale"
-  bottom: "inception_b3_7x1"
-  top: "inception_b3_7x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b3_7x1_relu"
   type: "ReLU"
@@ -3835,19 +4978,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b3_1x7_2_reduce"
   top: "inception_b3_1x7_2_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b3_1x7_2_reduce_scale"
-  type: "Scale"
-  bottom: "inception_b3_1x7_2_reduce"
-  top: "inception_b3_1x7_2_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b3_1x7_2_reduce_relu"
   type: "ReLU"
@@ -3889,19 +5049,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b3_1x7_2"
   top: "inception_b3_1x7_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b3_1x7_2_scale"
-  type: "Scale"
-  bottom: "inception_b3_1x7_2"
-  top: "inception_b3_1x7_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b3_1x7_2_relu"
   type: "ReLU"
@@ -3943,19 +5120,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b3_7x1_2"
   top: "inception_b3_7x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b3_7x1_2_scale"
-  type: "Scale"
-  bottom: "inception_b3_7x1_2"
-  top: "inception_b3_7x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b3_7x1_2_relu"
   type: "ReLU"
@@ -3997,19 +5191,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b3_1x7_3"
   top: "inception_b3_1x7_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b3_1x7_3_scale"
-  type: "Scale"
-  bottom: "inception_b3_1x7_3"
-  top: "inception_b3_1x7_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b3_1x7_3_relu"
   type: "ReLU"
@@ -4051,19 +5262,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b3_7x1_3"
   top: "inception_b3_7x1_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b3_7x1_3_scale"
-  type: "Scale"
-  bottom: "inception_b3_7x1_3"
-  top: "inception_b3_7x1_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b3_7x1_3_relu"
   type: "ReLU"
@@ -4124,19 +5352,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b4_1x1"
   top: "inception_b4_1x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b4_1x1_scale"
-  type: "Scale"
-  bottom: "inception_b4_1x1"
-  top: "inception_b4_1x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b4_1x1_relu"
   type: "ReLU"
@@ -4176,19 +5421,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b4_1x1_2"
   top: "inception_b4_1x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b4_1x1_2_scale"
-  type: "Scale"
-  bottom: "inception_b4_1x1_2"
-  top: "inception_b4_1x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b4_1x1_2_relu"
   type: "ReLU"
@@ -4228,19 +5490,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b4_1x7_reduce"
   top: "inception_b4_1x7_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b4_1x7_reduce_scale"
-  type: "Scale"
-  bottom: "inception_b4_1x7_reduce"
-  top: "inception_b4_1x7_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b4_1x7_reduce_relu"
   type: "ReLU"
@@ -4282,19 +5561,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b4_1x7"
   top: "inception_b4_1x7"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b4_1x7_scale"
-  type: "Scale"
-  bottom: "inception_b4_1x7"
-  top: "inception_b4_1x7"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b4_1x7_relu"
   type: "ReLU"
@@ -4336,19 +5632,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b4_7x1"
   top: "inception_b4_7x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b4_7x1_scale"
-  type: "Scale"
-  bottom: "inception_b4_7x1"
-  top: "inception_b4_7x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b4_7x1_relu"
   type: "ReLU"
@@ -4388,19 +5701,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b4_1x7_2_reduce"
   top: "inception_b4_1x7_2_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b4_1x7_2_reduce_scale"
-  type: "Scale"
-  bottom: "inception_b4_1x7_2_reduce"
-  top: "inception_b4_1x7_2_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b4_1x7_2_reduce_relu"
   type: "ReLU"
@@ -4442,19 +5772,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b4_1x7_2"
   top: "inception_b4_1x7_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b4_1x7_2_scale"
-  type: "Scale"
-  bottom: "inception_b4_1x7_2"
-  top: "inception_b4_1x7_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b4_1x7_2_relu"
   type: "ReLU"
@@ -4496,19 +5843,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b4_7x1_2"
   top: "inception_b4_7x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b4_7x1_2_scale"
-  type: "Scale"
-  bottom: "inception_b4_7x1_2"
-  top: "inception_b4_7x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b4_7x1_2_relu"
   type: "ReLU"
@@ -4550,19 +5914,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b4_1x7_3"
   top: "inception_b4_1x7_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b4_1x7_3_scale"
-  type: "Scale"
-  bottom: "inception_b4_1x7_3"
-  top: "inception_b4_1x7_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b4_1x7_3_relu"
   type: "ReLU"
@@ -4604,19 +5985,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b4_7x1_3"
   top: "inception_b4_7x1_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b4_7x1_3_scale"
-  type: "Scale"
-  bottom: "inception_b4_7x1_3"
-  top: "inception_b4_7x1_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b4_7x1_3_relu"
   type: "ReLU"
@@ -4677,19 +6075,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b5_1x1"
   top: "inception_b5_1x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b5_1x1_scale"
-  type: "Scale"
-  bottom: "inception_b5_1x1"
-  top: "inception_b5_1x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b5_1x1_relu"
   type: "ReLU"
@@ -4729,19 +6144,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b5_1x1_2"
   top: "inception_b5_1x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b5_1x1_2_scale"
-  type: "Scale"
-  bottom: "inception_b5_1x1_2"
-  top: "inception_b5_1x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b5_1x1_2_relu"
   type: "ReLU"
@@ -4781,19 +6213,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b5_1x7_reduce"
   top: "inception_b5_1x7_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b5_1x7_reduce_scale"
-  type: "Scale"
-  bottom: "inception_b5_1x7_reduce"
-  top: "inception_b5_1x7_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b5_1x7_reduce_relu"
   type: "ReLU"
@@ -4835,19 +6284,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b5_1x7"
   top: "inception_b5_1x7"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b5_1x7_scale"
-  type: "Scale"
-  bottom: "inception_b5_1x7"
-  top: "inception_b5_1x7"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b5_1x7_relu"
   type: "ReLU"
@@ -4889,19 +6355,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b5_7x1"
   top: "inception_b5_7x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b5_7x1_scale"
-  type: "Scale"
-  bottom: "inception_b5_7x1"
-  top: "inception_b5_7x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b5_7x1_relu"
   type: "ReLU"
@@ -4941,19 +6424,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b5_1x7_2_reduce"
   top: "inception_b5_1x7_2_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b5_1x7_2_reduce_scale"
-  type: "Scale"
-  bottom: "inception_b5_1x7_2_reduce"
-  top: "inception_b5_1x7_2_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b5_1x7_2_reduce_relu"
   type: "ReLU"
@@ -4995,19 +6495,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b5_1x7_2"
   top: "inception_b5_1x7_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b5_1x7_2_scale"
-  type: "Scale"
-  bottom: "inception_b5_1x7_2"
-  top: "inception_b5_1x7_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b5_1x7_2_relu"
   type: "ReLU"
@@ -5049,19 +6566,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b5_7x1_2"
   top: "inception_b5_7x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b5_7x1_2_scale"
-  type: "Scale"
-  bottom: "inception_b5_7x1_2"
-  top: "inception_b5_7x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b5_7x1_2_relu"
   type: "ReLU"
@@ -5103,19 +6637,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b5_1x7_3"
   top: "inception_b5_1x7_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b5_1x7_3_scale"
-  type: "Scale"
-  bottom: "inception_b5_1x7_3"
-  top: "inception_b5_1x7_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b5_1x7_3_relu"
   type: "ReLU"
@@ -5157,19 +6708,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b5_7x1_3"
   top: "inception_b5_7x1_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b5_7x1_3_scale"
-  type: "Scale"
-  bottom: "inception_b5_7x1_3"
-  top: "inception_b5_7x1_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b5_7x1_3_relu"
   type: "ReLU"
@@ -5230,19 +6798,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b6_1x1"
   top: "inception_b6_1x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b6_1x1_scale"
-  type: "Scale"
-  bottom: "inception_b6_1x1"
-  top: "inception_b6_1x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b6_1x1_relu"
   type: "ReLU"
@@ -5282,19 +6867,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b6_1x1_2"
   top: "inception_b6_1x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b6_1x1_2_scale"
-  type: "Scale"
-  bottom: "inception_b6_1x1_2"
-  top: "inception_b6_1x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b6_1x1_2_relu"
   type: "ReLU"
@@ -5334,19 +6936,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b6_1x7_reduce"
   top: "inception_b6_1x7_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b6_1x7_reduce_scale"
-  type: "Scale"
-  bottom: "inception_b6_1x7_reduce"
-  top: "inception_b6_1x7_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b6_1x7_reduce_relu"
   type: "ReLU"
@@ -5388,19 +7007,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b6_1x7"
   top: "inception_b6_1x7"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b6_1x7_scale"
-  type: "Scale"
-  bottom: "inception_b6_1x7"
-  top: "inception_b6_1x7"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b6_1x7_relu"
   type: "ReLU"
@@ -5442,19 +7078,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b6_7x1"
   top: "inception_b6_7x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b6_7x1_scale"
-  type: "Scale"
-  bottom: "inception_b6_7x1"
-  top: "inception_b6_7x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b6_7x1_relu"
   type: "ReLU"
@@ -5494,19 +7147,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b6_1x7_2_reduce"
   top: "inception_b6_1x7_2_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b6_1x7_2_reduce_scale"
-  type: "Scale"
-  bottom: "inception_b6_1x7_2_reduce"
-  top: "inception_b6_1x7_2_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b6_1x7_2_reduce_relu"
   type: "ReLU"
@@ -5548,19 +7218,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b6_1x7_2"
   top: "inception_b6_1x7_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b6_1x7_2_scale"
-  type: "Scale"
-  bottom: "inception_b6_1x7_2"
-  top: "inception_b6_1x7_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b6_1x7_2_relu"
   type: "ReLU"
@@ -5602,19 +7289,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b6_7x1_2"
   top: "inception_b6_7x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b6_7x1_2_scale"
-  type: "Scale"
-  bottom: "inception_b6_7x1_2"
-  top: "inception_b6_7x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b6_7x1_2_relu"
   type: "ReLU"
@@ -5656,19 +7360,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b6_1x7_3"
   top: "inception_b6_1x7_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b6_1x7_3_scale"
-  type: "Scale"
-  bottom: "inception_b6_1x7_3"
-  top: "inception_b6_1x7_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b6_1x7_3_relu"
   type: "ReLU"
@@ -5710,19 +7431,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b6_7x1_3"
   top: "inception_b6_7x1_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b6_7x1_3_scale"
-  type: "Scale"
-  bottom: "inception_b6_7x1_3"
-  top: "inception_b6_7x1_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b6_7x1_3_relu"
   type: "ReLU"
@@ -5783,19 +7521,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b7_1x1"
   top: "inception_b7_1x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b7_1x1_scale"
-  type: "Scale"
-  bottom: "inception_b7_1x1"
-  top: "inception_b7_1x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b7_1x1_relu"
   type: "ReLU"
@@ -5835,19 +7590,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b7_1x1_2"
   top: "inception_b7_1x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b7_1x1_2_scale"
-  type: "Scale"
-  bottom: "inception_b7_1x1_2"
-  top: "inception_b7_1x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b7_1x1_2_relu"
   type: "ReLU"
@@ -5887,19 +7659,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b7_1x7_reduce"
   top: "inception_b7_1x7_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b7_1x7_reduce_scale"
-  type: "Scale"
-  bottom: "inception_b7_1x7_reduce"
-  top: "inception_b7_1x7_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b7_1x7_reduce_relu"
   type: "ReLU"
@@ -5941,19 +7730,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b7_1x7"
   top: "inception_b7_1x7"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b7_1x7_scale"
-  type: "Scale"
-  bottom: "inception_b7_1x7"
-  top: "inception_b7_1x7"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b7_1x7_relu"
   type: "ReLU"
@@ -5995,19 +7801,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b7_7x1"
   top: "inception_b7_7x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b7_7x1_scale"
-  type: "Scale"
-  bottom: "inception_b7_7x1"
-  top: "inception_b7_7x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b7_7x1_relu"
   type: "ReLU"
@@ -6047,19 +7870,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b7_1x7_2_reduce"
   top: "inception_b7_1x7_2_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b7_1x7_2_reduce_scale"
-  type: "Scale"
-  bottom: "inception_b7_1x7_2_reduce"
-  top: "inception_b7_1x7_2_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b7_1x7_2_reduce_relu"
   type: "ReLU"
@@ -6101,19 +7941,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b7_1x7_2"
   top: "inception_b7_1x7_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b7_1x7_2_scale"
-  type: "Scale"
-  bottom: "inception_b7_1x7_2"
-  top: "inception_b7_1x7_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b7_1x7_2_relu"
   type: "ReLU"
@@ -6155,19 +8012,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b7_7x1_2"
   top: "inception_b7_7x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_b7_7x1_2_scale"
-  type: "Scale"
-  bottom: "inception_b7_7x1_2"
-  top: "inception_b7_7x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_b7_7x1_2_relu"
   type: "ReLU"
@@ -6209,17 +8083,33 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b7_1x7_3"
   top: "inception_b7_1x7_3"
-  batch_norm_param {
-    use_global_stats: false
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
   }
-}
-layer {
-  name: "inception_b7_1x7_3_scale"
-  type: "Scale"
-  bottom: "inception_b7_1x7_3"
-  top: "inception_b7_1x7_3"
-  scale_param {
-    bias_term: true
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
 layer {
@@ -6263,17 +8153,33 @@ layer {
   type: "BatchNorm"
   bottom: "inception_b7_7x1_3"
   top: "inception_b7_7x1_3"
-  batch_norm_param {
-    use_global_stats: false
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
   }
-}
-layer {
-  name: "inception_b7_7x1_3_scale"
-  type: "Scale"
-  bottom: "inception_b7_7x1_3"
-  top: "inception_b7_7x1_3"
-  scale_param {
-    bias_term: true
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  batch_norm_param {
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
 layer {
@@ -6335,19 +8241,36 @@ layer {
   type: "BatchNorm"
   bottom: "reduction_b_3x3_reduce"
   top: "reduction_b_3x3_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "reduction_b_3x3_reduce_scale"
-  type: "Scale"
-  bottom: "reduction_b_3x3_reduce"
-  top: "reduction_b_3x3_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "reduction_b_3x3_reduce_relu"
   type: "ReLU"
@@ -6387,19 +8310,36 @@ layer {
   type: "BatchNorm"
   bottom: "reduction_b_3x3"
   top: "reduction_b_3x3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "reduction_b_3x3_scale"
-  type: "Scale"
-  bottom: "reduction_b_3x3"
-  top: "reduction_b_3x3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "reduction_b_3x3_relu"
   type: "ReLU"
@@ -6439,19 +8379,36 @@ layer {
   type: "BatchNorm"
   bottom: "reduction_b_1x7_reduce"
   top: "reduction_b_1x7_reduce"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "reduction_b_1x7_reduce_scale"
-  type: "Scale"
-  bottom: "reduction_b_1x7_reduce"
-  top: "reduction_b_1x7_reduce"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "reduction_b_1x7_reduce_relu"
   type: "ReLU"
@@ -6493,19 +8450,36 @@ layer {
   type: "BatchNorm"
   bottom: "reduction_b_1x7"
   top: "reduction_b_1x7"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "reduction_b_1x7_scale"
-  type: "Scale"
-  bottom: "reduction_b_1x7"
-  top: "reduction_b_1x7"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "reduction_b_1x7_relu"
   type: "ReLU"
@@ -6547,19 +8521,36 @@ layer {
   type: "BatchNorm"
   bottom: "reduction_b_7x1"
   top: "reduction_b_7x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "reduction_b_7x1_scale"
-  type: "Scale"
-  bottom: "reduction_b_7x1"
-  top: "reduction_b_7x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "reduction_b_7x1_relu"
   type: "ReLU"
@@ -6599,19 +8590,36 @@ layer {
   type: "BatchNorm"
   bottom: "reduction_b_3x3_2"
   top: "reduction_b_3x3_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "reduction_b_3x3_2_scale"
-  type: "Scale"
-  bottom: "reduction_b_3x3_2"
-  top: "reduction_b_3x3_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "reduction_b_3x3_2_relu"
   type: "ReLU"
@@ -6671,19 +8679,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c1_1x1"
   top: "inception_c1_1x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c1_1x1_scale"
-  type: "Scale"
-  bottom: "inception_c1_1x1"
-  top: "inception_c1_1x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c1_1x1_relu"
   type: "ReLU"
@@ -6723,19 +8748,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c1_1x1_2"
   top: "inception_c1_1x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c1_1x1_2_scale"
-  type: "Scale"
-  bottom: "inception_c1_1x1_2"
-  top: "inception_c1_1x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c1_1x1_2_relu"
   type: "ReLU"
@@ -6775,19 +8817,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c1_1x1_3"
   top: "inception_c1_1x1_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c1_1x1_3_scale"
-  type: "Scale"
-  bottom: "inception_c1_1x1_3"
-  top: "inception_c1_1x1_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c1_1x1_3_relu"
   type: "ReLU"
@@ -6829,19 +8888,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c1_1x3"
   top: "inception_c1_1x3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c1_1x3_scale"
-  type: "Scale"
-  bottom: "inception_c1_1x3"
-  top: "inception_c1_1x3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c1_1x3_relu"
   type: "ReLU"
@@ -6883,19 +8959,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c1_3x1"
   top: "inception_c1_3x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c1_3x1_scale"
-  type: "Scale"
-  bottom: "inception_c1_3x1"
-  top: "inception_c1_3x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c1_3x1_relu"
   type: "ReLU"
@@ -6935,19 +9028,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c1_1x1_4"
   top: "inception_c1_1x1_4"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c1_1x1_4_scale"
-  type: "Scale"
-  bottom: "inception_c1_1x1_4"
-  top: "inception_c1_1x1_4"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c1_1x1_4_relu"
   type: "ReLU"
@@ -6989,19 +9099,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c1_1x3_2"
   top: "inception_c1_1x3_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c1_1x3_2_scale"
-  type: "Scale"
-  bottom: "inception_c1_1x3_2"
-  top: "inception_c1_1x3_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c1_1x3_2_relu"
   type: "ReLU"
@@ -7043,19 +9170,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c1_3x1_2"
   top: "inception_c1_3x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c1_3x1_2_scale"
-  type: "Scale"
-  bottom: "inception_c1_3x1_2"
-  top: "inception_c1_3x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c1_3x1_2_relu"
   type: "ReLU"
@@ -7097,19 +9241,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c1_1x3_3"
   top: "inception_c1_1x3_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c1_1x3_3_scale"
-  type: "Scale"
-  bottom: "inception_c1_1x3_3"
-  top: "inception_c1_1x3_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c1_1x3_3_relu"
   type: "ReLU"
@@ -7151,19 +9312,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c1_3x1_3"
   top: "inception_c1_3x1_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c1_3x1_3_scale"
-  type: "Scale"
-  bottom: "inception_c1_3x1_3"
-  top: "inception_c1_3x1_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c1_3x1_3_relu"
   type: "ReLU"
@@ -7226,19 +9404,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c2_1x1"
   top: "inception_c2_1x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c2_1x1_scale"
-  type: "Scale"
-  bottom: "inception_c2_1x1"
-  top: "inception_c2_1x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c2_1x1_relu"
   type: "ReLU"
@@ -7278,19 +9473,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c2_1x1_2"
   top: "inception_c2_1x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c2_1x1_2_scale"
-  type: "Scale"
-  bottom: "inception_c2_1x1_2"
-  top: "inception_c2_1x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c2_1x1_2_relu"
   type: "ReLU"
@@ -7330,19 +9542,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c2_1x1_3"
   top: "inception_c2_1x1_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c2_1x1_3_scale"
-  type: "Scale"
-  bottom: "inception_c2_1x1_3"
-  top: "inception_c2_1x1_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c2_1x1_3_relu"
   type: "ReLU"
@@ -7384,19 +9613,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c2_1x3"
   top: "inception_c2_1x3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c2_1x3_scale"
-  type: "Scale"
-  bottom: "inception_c2_1x3"
-  top: "inception_c2_1x3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c2_1x3_relu"
   type: "ReLU"
@@ -7438,19 +9684,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c2_3x1"
   top: "inception_c2_3x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c2_3x1_scale"
-  type: "Scale"
-  bottom: "inception_c2_3x1"
-  top: "inception_c2_3x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c2_3x1_relu"
   type: "ReLU"
@@ -7490,19 +9753,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c2_1x1_4"
   top: "inception_c2_1x1_4"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c2_1x1_4_scale"
-  type: "Scale"
-  bottom: "inception_c2_1x1_4"
-  top: "inception_c2_1x1_4"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c2_1x1_4_relu"
   type: "ReLU"
@@ -7544,19 +9824,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c2_1x3_2"
   top: "inception_c2_1x3_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c2_1x3_2_scale"
-  type: "Scale"
-  bottom: "inception_c2_1x3_2"
-  top: "inception_c2_1x3_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c2_1x3_2_relu"
   type: "ReLU"
@@ -7598,19 +9895,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c2_3x1_2"
   top: "inception_c2_3x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c2_3x1_2_scale"
-  type: "Scale"
-  bottom: "inception_c2_3x1_2"
-  top: "inception_c2_3x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c2_3x1_2_relu"
   type: "ReLU"
@@ -7652,19 +9966,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c2_1x3_3"
   top: "inception_c2_1x3_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c2_1x3_3_scale"
-  type: "Scale"
-  bottom: "inception_c2_1x3_3"
-  top: "inception_c2_1x3_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c2_1x3_3_relu"
   type: "ReLU"
@@ -7706,19 +10037,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c2_3x1_3"
   top: "inception_c2_3x1_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c2_3x1_3_scale"
-  type: "Scale"
-  bottom: "inception_c2_3x1_3"
-  top: "inception_c2_3x1_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c2_3x1_3_relu"
   type: "ReLU"
@@ -7781,19 +10129,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c3_1x1"
   top: "inception_c3_1x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c3_1x1_scale"
-  type: "Scale"
-  bottom: "inception_c3_1x1"
-  top: "inception_c3_1x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c3_1x1_relu"
   type: "ReLU"
@@ -7833,19 +10198,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c3_1x1_2"
   top: "inception_c3_1x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c3_1x1_2_scale"
-  type: "Scale"
-  bottom: "inception_c3_1x1_2"
-  top: "inception_c3_1x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c3_1x1_2_relu"
   type: "ReLU"
@@ -7885,19 +10267,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c3_1x1_3"
   top: "inception_c3_1x1_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c3_1x1_3_scale"
-  type: "Scale"
-  bottom: "inception_c3_1x1_3"
-  top: "inception_c3_1x1_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c3_1x1_3_relu"
   type: "ReLU"
@@ -7939,19 +10338,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c3_1x3"
   top: "inception_c3_1x3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c3_1x3_scale"
-  type: "Scale"
-  bottom: "inception_c3_1x3"
-  top: "inception_c3_1x3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c3_1x3_relu"
   type: "ReLU"
@@ -7993,19 +10409,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c3_3x1"
   top: "inception_c3_3x1"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c3_3x1_scale"
-  type: "Scale"
-  bottom: "inception_c3_3x1"
-  top: "inception_c3_3x1"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c3_3x1_relu"
   type: "ReLU"
@@ -8045,19 +10478,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c3_1x1_4"
   top: "inception_c3_1x1_4"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c3_1x1_4_scale"
-  type: "Scale"
-  bottom: "inception_c3_1x1_4"
-  top: "inception_c3_1x1_4"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c3_1x1_4_relu"
   type: "ReLU"
@@ -8099,19 +10549,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c3_1x3_2"
   top: "inception_c3_1x3_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c3_1x3_2_scale"
-  type: "Scale"
-  bottom: "inception_c3_1x3_2"
-  top: "inception_c3_1x3_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c3_1x3_2_relu"
   type: "ReLU"
@@ -8153,19 +10620,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c3_3x1_2"
   top: "inception_c3_3x1_2"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c3_3x1_2_scale"
-  type: "Scale"
-  bottom: "inception_c3_3x1_2"
-  top: "inception_c3_3x1_2"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c3_3x1_2_relu"
   type: "ReLU"
@@ -8207,19 +10691,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c3_1x3_3"
   top: "inception_c3_1x3_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c3_1x3_3_scale"
-  type: "Scale"
-  bottom: "inception_c3_1x3_3"
-  top: "inception_c3_1x3_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c3_1x3_3_relu"
   type: "ReLU"
@@ -8261,19 +10762,36 @@ layer {
   type: "BatchNorm"
   bottom: "inception_c3_3x1_3"
   top: "inception_c3_3x1_3"
+param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 1.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
+  param {
+    lr_mult: 0.0
+    decay_mult: 0.0
+  }
   batch_norm_param {
-    use_global_stats: false
+    moving_average_fraction: 0.980000019073
+    eps: 9.99999974738e-05
+    scale_filler {
+      type: "constant"
+      value: 1.0
+    }
+    bias_filler {
+      type: "constant"
+      value: 0.0
+    }
   }
 }
-layer {
-  name: "inception_c3_3x1_3_scale"
-  type: "Scale"
-  bottom: "inception_c3_3x1_3"
-  top: "inception_c3_3x1_3"
-  scale_param {
-    bias_term: true
-  }
-}
+
 layer {
   name: "inception_c3_3x1_3_relu"
   type: "ReLU"
@@ -8307,7 +10825,7 @@ layer {
   bottom: "pool_8x8_s1"
   top: "pool_8x8_s1_drop"
   dropout_param {
-    dropout_ratio: 0.5
+    dropout_ratio: 0.2
   }
 }
 layer {
@@ -8326,8 +10844,7 @@ layer {
   inner_product_param {
     #num_output: 101
     weight_filler {
-      type: "msra"
-      variance_norm: FAN_OUT
+      type: "xavier"
     }
     bias_filler {
       type: "constant"

@@ -7,7 +7,7 @@ import numpy as np
 import PIL.Image
 import scipy.misc
 import time
-
+import sys
 
 def get_net(caffemodel, deploy_file, use_gpu=True):
     """
@@ -140,8 +140,9 @@ def forward_pass(images, net, transformer,verbose, batch_size=None, layer_name='
                   for x in xrange(0, len(caffe_images), batch_size)]
     start = time.clock()
     for k, chunk in enumerate(todoChunks):
-#        if verbose == True:
-#            print "Processing batch %d out of %d" % (k, len(todoChunks))
+        percent=100*k/len(todoChunks)
+        print "Processing batch %d out of %d, %d %% \r" % (k, len(todoChunks), percent),
+        sys.stdout.flush()
         new_shape = (len(chunk),) + tuple(dims)
         if net.blobs['data'].data.shape != new_shape:
             net.blobs['data'].reshape(*new_shape)
