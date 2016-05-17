@@ -8,6 +8,7 @@ import PIL.Image
 import scipy.misc
 import time
 import sys
+from tqdm import tqdm
 
 def get_net(caffemodel, deploy_file, use_gpu=True):
     """
@@ -139,10 +140,9 @@ def forward_pass(images, net, transformer,verbose, batch_size=None, layer_name='
     todoChunks = [caffe_images[x:x + batch_size]
                   for x in xrange(0, len(caffe_images), batch_size)]
     start = time.clock()
-    for k, chunk in enumerate(todoChunks):
-        percent=100*k/len(todoChunks)
-        print "Processing batch %d out of %d, %d %% \r" % (k, len(todoChunks), percent),
-        sys.stdout.flush()
+    for k, chunk in tqdm(list(enumerate(todoChunks))):
+        #print "Processing batch %d out of %d \r" % (k, len(todoChunks)),
+        #sys.stdout.flush()
         new_shape = (len(chunk),) + tuple(dims)
         if net.blobs['data'].data.shape != new_shape:
             net.blobs['data'].reshape(*new_shape)
