@@ -10,7 +10,7 @@ def get_arguments():
     parser.add_argument("input_dir")
     parser.add_argument("output_dir")
     parser.add_argument("image_list", help="File containing the relative path to each file we want to convert")
-    parser.add_argument("--colorjet", type=bool, default=True)
+    parser.add_argument("--colorjet", type=bool, default=False)
     args = parser.parse_args()
     return args
 
@@ -57,13 +57,14 @@ def scaleit_experimental(img):
 
 if __name__ == "__main__":
     args = get_arguments()
+    print args
     output_dir =  args.output_dir
     input_dir = args.input_dir
     IMSIZE=(256,256)
     with open(args.image_list) as tmp:
         images = tmp.readlines()
     for i_path in images:
-        #import pdb; pdb.set_trace()
+#        import ipdb; ipdb.set_trace()
         img_path = i_path.strip()
         img = cv2.imread(join(input_dir, img_path), -1);
         newimg = scaleit_experimental(img)
