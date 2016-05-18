@@ -144,7 +144,7 @@ if __name__ == '__main__':
     args = get_arguments()
     print "in main, args.use_gpu= %s" % args.use_gpu
     f_extractor = feature_handler.FeatureCreator(
-        args.net_proto, args.net_model,args.use_gpu, args.mean_pixel, args.mean_file,
+        args.net_proto, args.net_model, args.mean_pixel, args.mean_file, args.use_gpu,
          layer_name=args.layer_name)
     f_extractor.batch_size = args.batch_size
     f_extractor.center_data = args.center_data
