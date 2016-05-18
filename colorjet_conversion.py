@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 import numpy as np
 import cv2
 from os.path import join
-
+from h5py import File as hfile
 
 def get_arguments():
     parser = ArgumentParser(
@@ -11,6 +11,8 @@ def get_arguments():
     parser.add_argument("output_dir")
     parser.add_argument("image_list", help="File containing the relative path to each file we want to convert")
     parser.add_argument("--colorjet", type=bool, default=False)
+    parser.add_argument("--h5", type=bool, default=False)
+    parser.add_argument("--ext", default="")
     args = parser.parse_args()
     return args
 
@@ -24,7 +26,7 @@ def scaleit_experimental(img):
     if img is None:
         return None
     istats = ( np.min(img[img>0]),	np.max(img))
-    imrange=  1.0-(img.astype('float32')-istats[0])/(istats[1]-istats[0]);
+    imrange =  1.0-(img.astype('float32')-istats[0])/(istats[1]-istats[0])
     imrange[img_mask] = 0
     imrange= 255.0*imrange
     imsz = imrange.shape
@@ -36,7 +38,8 @@ def scaleit_experimental(img):
     if(len(imsz)==3):
         nchan = imsz[2]
     imgcanvas = np.zeros(  (mxdim,mxdim,nchan), dtype='uint8' )
-    imgcanvas[offs_row:offs_row+imsz[0], offs_col:offs_col+imsz[1]] = img.reshape( (imsz[0],imsz[1],nchan) )
+    imgcanvas[offs_row:offs_row+imsz[0], offs_col:offs_col+imsz[1]] = imrange.reshape( (imsz[0],imsz[1],nchan) )
+    img = imrange
     # take rows
     if(offs_row):
         tr = img[0,:]
@@ -66,10 +69,14 @@ if __name__ == "__main__":
     for i_path in images:
 #        import ipdb; ipdb.set_trace()
         img_path = i_path.strip()
-        img = cv2.imread(join(input_dir, img_path), -1);
+        if args.h5:
+            h = hfile(join(input_dir, img_path))
+            img = h['depth'][:]
+        else:
+            img = cv2.imread(join(input_dir, img_path), -1);
         newimg = scaleit_experimental(img)
         if newimg is None:
             continue
         if args.colorjet:
             newimg = cv2.applyColorMap(newimg, cv2.COLORMAP_JET)
-        cv2.imwrite(join(output_dir, img_path), newimg)
+        cv2.imwrite(join(output_dir, img_path + args.ext), newimg)
