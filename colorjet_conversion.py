@@ -10,9 +10,11 @@ def get_arguments():
     parser.add_argument("input_dir")
     parser.add_argument("output_dir")
     parser.add_argument("image_list", help="File containing the relative path to each file we want to convert")
-    parser.add_argument("--colorjet", type=bool, default=False)
-    parser.add_argument("--h5", type=bool, default=False)
+    parser.add_argument("--colorjet", action="store_true")
+    parser.add_argument("--h5", action="store_true")
     parser.add_argument("--ext", default="")
+    parser.add_argument("--invert", action="store_true")
+    parser.add_argument("--buggy", action="store_true")
     args = parser.parse_args()
     return args
 
@@ -21,12 +23,15 @@ def get_arguments():
 # Note that the opposite definition can be found in function depth2jet.cpp blue(close), red(far)
 # When re-training the network it should not make a difference, but the second definition, is necessary
 # for noise augmentation. Nan values (which we convert to 0 distance) are therefore dark blue and close objects are also blue.
-def scaleit_experimental(img):
+def scaleit_experimental(img, invert, buggy):
     img_mask = (img == 0)
     if img is None:
         return None
     istats = ( np.min(img[img>0]),	np.max(img))
-    imrange =  1.0-(img.astype('float32')-istats[0])/(istats[1]-istats[0])
+    if invert:
+        imrange =  1.0-(img.astype('float32')-istats[0])/(istats[1]-istats[0])
+    else:
+        imrange = (img.astype('float32')-istats[0])/(istats[1]-istats[0])
     imrange[img_mask] = 0
     imrange= 255.0*imrange
     imsz = imrange.shape
@@ -37,9 +42,10 @@ def scaleit_experimental(img):
     nchan = 1
     if(len(imsz)==3):
         nchan = imsz[2]
+    if buggy is False:
+        img = imrange
     imgcanvas = np.zeros(  (mxdim,mxdim,nchan), dtype='uint8' )
-    imgcanvas[offs_row:offs_row+imsz[0], offs_col:offs_col+imsz[1]] = imrange.reshape( (imsz[0],imsz[1],nchan) )
-    img = imrange
+    imgcanvas[offs_row:offs_row+imsz[0], offs_col:offs_col+imsz[1]] = img.reshape( (imsz[0],imsz[1],nchan) )
     # take rows
     if(offs_row):
         tr = img[0,:]
@@ -74,7 +80,7 @@ if __name__ == "__main__":
             img = h['depth'][:]
         else:
             img = cv2.imread(join(input_dir, img_path), -1);
-        newimg = scaleit_experimental(img)
+        newimg = scaleit_experimental(img, args.invert, args.buggy)
         if newimg is None:
             continue
         if args.colorjet:
