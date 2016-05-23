@@ -53,11 +53,11 @@ def run_washington_splits(data_dir, split_dir, features, n_splits):
         for line in train_lines:
             [path, classLabel] = line.split()
             nClass = int(classLabel)
-            train_features[nClass] = np.vstack([train_features[nClass], features[join(data_dir, path)].reshape(1, f_size)])
+            train_features[nClass] = np.vstack([train_features[nClass], features[path].reshape(1, f_size)])
         for line in test_lines:
             [path, classLabel] = line.split()
             nClass = int(classLabel)
-            test_features[nClass] = np.vstack([test_features[nClass], features[join(data_dir, path)].reshape(1, f_size)])
+            test_features[nClass] = np.vstack([test_features[nClass], features[path].reshape(1, f_size)])
         train_labels = np.hstack(
             [np.ones(data.shape[0]) * c for c, data in enumerate(train_features)]).ravel()
         test_labels = np.hstack(
@@ -96,6 +96,7 @@ def make_features(args):
     f_extractor.batch_size = args.batch_size
     f_extractor.center_data = args.center_data
     f_extractor.set_data_scale(args.scale)
+    f_extractor.data_prefix = args.data_dir
     split_dir = args.split_dir
     train_lines = open(join(split_dir, 'depth_train_split_0.txt'), 'rt').readlines()
     test_lines = open(join(split_dir, 'depth_test_split_0.txt'), 'rt').readlines()
@@ -126,13 +127,16 @@ if __name__ == '__main__':
     start_time = time.time()
     args = get_arguments()
     print args
-#    import ipdb; ipdb.set_trace()
+    import ipdb; ipdb.set_trace()
     conf_path = args.conf_name
-    features = get_features(args)
-    if features is None:
-        make_features(args)
-        print "Relaunch script to run svm"
-        quit()
+    if args.second_dict:
+        features = fuse_features(args)
+    else:
+        features = get_features(args)
+        if features is None:
+            make_features(args)
+            print "Relaunch script to run svm"
+            quit()
     run_washington_splits(args.data_dir, args.split_dir, features, args.splits)
     elapsed_time = time.time() - start_time
     print " Total elapsed time: %d " % elapsed_time

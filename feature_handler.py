@@ -176,6 +176,7 @@ class FeatureCreator:
         self.batch_size = 256
         self.scale = 1
         self.verbose = verbose
+        self.data_prefix = ''
 
     def prepare_features(self, image_files):
         #import pdb; pdb.set_trace()
@@ -201,7 +202,8 @@ class FeatureCreator:
         i = 0
         # load the features in a map with their path as key
         for f in image_files:
-            self.features[f] = feats[i]
+            short_name = f.replace(self.data_prefix, '')  # saves only the relative path
+            self.features[short_name] = feats[i]
             i += 1
         self.net = None  # free video memory
 
