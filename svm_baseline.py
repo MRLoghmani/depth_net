@@ -90,6 +90,7 @@ def do_svm(loaded_data, split_n):
 
 
 def make_features(args):
+    print "Computing features"
     f_extractor = feature_handler.FeatureCreator(
         args.net_proto, args.net_model, args.mean_pixel, args.mean_file, args.use_gpu,
          layer_name=args.layer_name)
@@ -108,6 +109,7 @@ def make_features(args):
         pickle.dump(f_extractor.features, f, pickle.HIGHEST_PROTOCOL)
 
 def get_features(args):
+    print "Loading precomputed features"
     try:
         with open(args.feature_dict, 'rb') as f:
             return pickle.load(f)
@@ -115,12 +117,14 @@ def get_features(args):
         return None
 
 def fuse_features(args):
+    print "Fusing features"
     with open(args.feature_dict, 'rb') as f:
         first = pickle.load(f)
     with open(args.second_dict, 'rb') as f:
         second = pickle.load(f)
     for path in first.keys():
-        first[path] = np.vstack(first[path], second[path])
+        first[path] = np.hstack([first[path], second[path]])
+    print "Done"
     return first
 
 if __name__ == '__main__':
