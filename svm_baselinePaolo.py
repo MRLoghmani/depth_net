@@ -28,11 +28,12 @@ def get_arguments():
     parser.add_argument("--use-gpu", type=bool, default=True, help="If set false, will force CPU inference")
     parser.add_argument("--center_data", type=bool, default=False)
     parser.add_argument("--scale", type=float, default=None)
+    parser.add_argument("--splits", type=int, default=10)
 
     args = parser.parse_args()
     return args
 
-def run_washington_splits(data_dir, split_dir, f_extractor):
+def run_washington_splits(data_dir, split_dir, f_extractor, n_splits):
     splits_acc = Array('d', range(10))
     classes = 51
     f_size = f_extractor.f_size
@@ -126,4 +127,4 @@ if __name__ == '__main__':
     f_extractor.batch_size = args.batch_size
     f_extractor.center_data = args.center_data
     f_extractor.set_data_scale(args.scale)
-    run_washington_splits(args.data_dir, args.split_dir, f_extractor)
+    run_washington_splits(args.data_dir, args.split_dir, f_extractor, args.splits)

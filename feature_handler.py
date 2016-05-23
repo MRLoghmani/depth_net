@@ -170,10 +170,10 @@ class FeatureCreator:
         self.transformer = get_transformer(
             net_proto, mean_pixel=mean_pixel, mean_file=mean_file)
         # self.features6 = {}
-        self.features7 = {}
+        self.features = {}
         self.layer_name = layer_name
         self.f_size = self.net.blobs[self.layer_name].data.shape[1]
-        self.batch_size = 512
+        self.batch_size = 256
         self.scale = 1
         self.verbose = verbose
 
@@ -201,13 +201,12 @@ class FeatureCreator:
         i = 0
         # load the features in a map with their path as key
         for f in image_files:
-            # self.features6[f] = fc6[i]
-            self.features7[f] = feats[i]
+            self.features[f] = feats[i]
             i += 1
         self.net = None  # free video memory
 
     def get_features(self, image_path):
-        feats = self.features7.get(image_path, None)
+        feats = self.features.get(image_path, None)
         if feats is None:
             print "!!! Missing features for " + image_path
         return feats
@@ -217,17 +216,3 @@ class FeatureCreator:
 	self.transformer.set_raw_scale('data', scale)
 	print "Set transformer raw data scale to %f" % scale
 	self.scale = scale
-	
-    def get_features_adv(self, image_files):
-        fc6 = None
-        fc7 = None
-        for f in image_files:
-            feats6 = self.features6[f]
-            feats7 = self.features7[f]
-            if fc6 is None:
-                fc6 = feats6
-                fc7 = feats7
-            else:
-                fc6 = np.vstack((fc6, feats6))
-                fc7 = np.vstack((fc7, feats7))
-        return (fc6, fc7)
