@@ -179,7 +179,7 @@ class FeatureCreator:
         self.data_prefix = ''
 
     def prepare_features(self, image_files):
-        #import pdb; pdb.set_trace()
+#        import ipdb; ipdb.set_trace()
         _, channels, height, width = self.transformer.inputs['data']
         if channels == 3:
             mode = 'RGB'
@@ -187,6 +187,7 @@ class FeatureCreator:
             mode = 'L'
         else:
             raise ValueError('Invalid number for channels: %s' % channels)
+        print "Loading images"
         images = [load_image(image_file, height, width, mode) for image_file in image_files]
 	mean = 0.0
 	for im in images:
@@ -197,12 +198,15 @@ class FeatureCreator:
             self.transformer.set_mean('data', np.ones(self.transformer.inputs['data'][1]) * mean)
             print "Will center data"
         # Classify the image
+        print "Extracting features"
         feats = forward_pass(images, self.net,
                              self.transformer,self.verbose, batch_size=self.batch_size, layer_name=self.layer_name)
         i = 0
         # load the features in a map with their path as key
         for f in image_files:
             short_name = f.replace(self.data_prefix, '')  # saves only the relative path
+            if short_name[0] == '/':
+                short_name = short_name[1:]
             self.features[short_name] = feats[i]
             i += 1
         self.net = None  # free video memory

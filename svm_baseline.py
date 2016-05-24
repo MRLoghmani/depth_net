@@ -17,26 +17,17 @@ LoadedData = namedtuple(
 def get_arguments():
     parser = ArgumentParser(
         description='SVM based classification for whole images.')
-    parser.add_argument("data_dir")
     parser.add_argument("split_dir")
-    parser.add_argument("net_proto")
-    parser.add_argument("net_model")
     parser.add_argument("feature_dict")
-    parser.add_argument("--mean_pixel", type=float)
-    parser.add_argument("--mean_file")
-    parser.add_argument("--batch-size", type=int, default=512)
-    parser.add_argument("--layer_name", help="Default is FC7", default='fc7')
-    parser.add_argument("--use_gpu", default=True, help="If set false, will force CPU inference")
-    parser.add_argument("--center_data", type=bool, default=False)
-    parser.add_argument("--scale", type=float, default=None)
+    parser.add_argument("--conf_name", default=None, help="If defined will save confusions matrices for each split at give output")
+    parser.add_argument("--split_prefix", default='depth_')
+    parser.add_argument("--switch_depth", action="store_true")
     parser.add_argument("--splits", type=int, default=10)
-    parser.add_argument("--conf_name", default='confusion.csv')
-    parser.add_argument("--second_dict")
     args = parser.parse_args()
     return args
 
 
-def run_washington_splits(data_dir, split_dir, features, n_splits):
+def run_washington_splits(split_dir, features, n_splits):
     splits_acc = []
     classes = 51
     f_size = features[features.keys()[0]].shape[0]
@@ -45,9 +36,9 @@ def run_washington_splits(data_dir, split_dir, features, n_splits):
         train_features = [np.empty((0, f_size)) for n in range(classes)]
         test_features = [np.empty((0, f_size)) for n in range(classes)]
         train_file = open(
-            join(split_dir, 'depth_train_split_' + str(x) + '.txt'), 'rt')
+            join(split_dir, args.split_prefix + 'train_split_' + str(x) + '.txt'), 'rt')
         test_file = open(
-            join(split_dir, 'depth_test_split_' + str(x) + '.txt'), 'rt')
+            join(split_dir, args.split_prefix + 'test_split_' + str(x) + '.txt'), 'rt')
         train_lines = train_file.readlines()
         test_lines = test_file.readlines()
         for line in train_lines:
@@ -80,33 +71,14 @@ def do_svm(loaded_data, split_n):
     clf.fit(loaded_data.train_patches, loaded_data.train_labels)
     res = clf.predict(loaded_data.test_patches)
     confusion = confusion_matrix( loaded_data.test_labels, res)
-    np.savetxt(conf_path + '_' + str(split_n) + '.csv', confusion)
+    if conf_path is not None:
+        np.savetxt(conf_path + '_' + str(split_n) + '.csv', confusion)
     correct = (res == loaded_data.test_labels).sum()
     score = clf.score(loaded_data.test_patches, loaded_data.test_labels)
     end = time.clock()
     print "Got " + str((100.0 * correct) / loaded_data.test_labels.size) \
         + "% correct, took " + str(end - start) + " seconds " + str(score)
     return score
-
-
-def make_features(args):
-    print "Computing features"
-    f_extractor = feature_handler.FeatureCreator(
-        args.net_proto, args.net_model, args.mean_pixel, args.mean_file, args.use_gpu,
-         layer_name=args.layer_name)
-    f_extractor.batch_size = args.batch_size
-    f_extractor.center_data = args.center_data
-    f_extractor.set_data_scale(args.scale)
-    f_extractor.data_prefix = args.data_dir
-    split_dir = args.split_dir
-    train_lines = open(join(split_dir, 'depth_train_split_0.txt'), 'rt').readlines()
-    test_lines = open(join(split_dir, 'depth_test_split_0.txt'), 'rt').readlines()
-    all_files = [join(args.data_dir, line.split()[0]) for line in train_lines] + \
-                [join(args.data_dir, line.split()[0]) for line in test_lines]
-    # preload all features so that they are handled in batches
-    f_extractor.prepare_features(all_files)
-    with open(args.feature_dict, 'wb') as f:
-        pickle.dump(f_extractor.features, f, pickle.HIGHEST_PROTOCOL)
 
 def get_features(args):
     print "Loading precomputed features"
@@ -123,24 +95,24 @@ def fuse_features(args):
     with open(args.second_dict, 'rb') as f:
         second = pickle.load(f)
     for path in first.keys():
-        first[path] = np.hstack([first[path], second[path]])
+        path2 = path
+        if args.switch_depth:
+            path2 = path[1:].replace("crop","depthcrop")
+        first[path] = np.hstack([first[path], second[path2]])
     print "Done"
     return first
 
 if __name__ == '__main__':
     start_time = time.time()
     args = get_arguments()
+    print "\n"
     print args
     import ipdb; ipdb.set_trace()
     conf_path = args.conf_name
-    if args.second_dict:
-        features = fuse_features(args)
-    else:
-        features = get_features(args)
-        if features is None:
-            make_features(args)
-            print "Relaunch script to run svm"
-            quit()
-    run_washington_splits(args.data_dir, args.split_dir, features, args.splits)
+    features = get_features(args)
+    if features is None:
+        print "Features not found or corruped - exiting"
+        quit()
+    run_washington_splits(args.split_dir, features, args.splits)
     elapsed_time = time.time() - start_time
     print " Total elapsed time: %d " % elapsed_time
