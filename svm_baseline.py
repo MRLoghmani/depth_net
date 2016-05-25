@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import re
 import pickle
 from sklearn.metrics import confusion_matrix
 from sklearn import svm
@@ -8,6 +9,7 @@ from collections import namedtuple
 from os.path import join
 import time
 
+type_regex = re.compile(ur'_([depthcrop]+)\.png')
 
 LoadedData = namedtuple(
     "LoadedData", "train_patches train_labels test_patches test_labels")
@@ -20,7 +22,6 @@ def get_arguments():
     parser.add_argument("feature_dict", nargs='+', help="Can be one or two feature dictionaries")
     parser.add_argument("--conf_name", default=None, help="If defined will save confusions matrices for each split at give output")
     parser.add_argument("--split_prefix", default='depth_')
-    parser.add_argument("--switch_depth", action="store_true")
     parser.add_argument("--splits", type=int, default=10)
     args = parser.parse_args()
     return args
@@ -107,6 +108,14 @@ def get_features(args):
     except:
         return None
 
+def get_type_from_string(path):
+    return re.search(type_regex, path).group(1)
+
+def get_split_type(args):
+    firstline = open(join(args.split_dir, args.split_prefix + 'train_split_0.txt'), 'rt').readlines()[0]
+    path = firstline.split()[0].strip()
+    return get_type_from_string(path)
+
 def fuse_features(args):
     feats = args.feature_dict
     print "Fusing features"
@@ -114,13 +123,19 @@ def fuse_features(args):
         first = pickle.load(f)
     with open(feats[1], 'rb') as f:
         second = pickle.load(f)
+    second_type = get_type_from_string(second.keys()[0])
+    first_type = get_type_from_string(first.keys()[0])
+    split_type = get_split_type(args)
+    needs_switch = first_type != second_type
+    feat_dict = {}
     for path in first.keys():
         path2 = path
-        if args.switch_depth:  # TODO: open first split and convert all dictionaries to that format
-            path2 = path.replace("crop","depthcrop")
-        first[path] = np.hstack([first[path], second[path2]])
+        if needs_switch:
+            path2 = path.replace(first_type, second_type)
+        save_path = path.replace(first_type, split_type)
+        feat_dict[save_path] = np.hstack([first[path], second[path2]])
     print "Done"
-    return first
+    return feat_dict
 
 if __name__ == '__main__':
     start_time = time.time()
