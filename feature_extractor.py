@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import pickle
 from argparse import ArgumentParser
 from os.path import join

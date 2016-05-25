@@ -7,7 +7,6 @@ import numpy as np
 import PIL.Image
 import scipy.misc
 import time
-import sys
 from tqdm import tqdm
 
 def get_net(caffemodel, deploy_file, use_gpu=True):
@@ -207,7 +206,7 @@ class FeatureCreator:
             short_name = f.replace(self.data_prefix, '')  # saves only the relative path
             if short_name[0] == '/':
                 short_name = short_name[1:]
-            self.features[short_name] = feats[i]
+            self.features[short_name] = feats[i].reshape(feats[i].size)
             i += 1
         self.net = None  # free video memory
 

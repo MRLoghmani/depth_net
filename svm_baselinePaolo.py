@@ -6,7 +6,7 @@ from collections import namedtuple
 from os.path import join
 import time
 import feature_handler
-from joblib import Parallel, delayed
+from joblib import Parallel
 import copy as c
 from multiprocessing import Process, Value, Array
 
