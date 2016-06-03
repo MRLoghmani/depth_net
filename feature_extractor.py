@@ -19,6 +19,7 @@ def get_arguments():
     parser.add_argument("--use_gpu", default=True, help="If set false, will force CPU inference")
     parser.add_argument("--center_data", action="store_true", help="If set will center the data")
     parser.add_argument("--scale", type=float, default=None)
+    parser.add_argument("--gpu_id", type=int, default=0)
     args = parser.parse_args()
     return args
 
@@ -27,7 +28,7 @@ def make_features(args):
     print "Starting feature generation procedure..."
     f_extractor = feature_handler_v2.FeatureCreator(
         args.net_proto, args.net_model, args.mean_pixel, args.mean_file, args.use_gpu,
-         layer_name=args.layer_name)
+         layer_name=args.layer_name, gpu_id=args.gpu_id)
     f_extractor.batch_size = args.batch_size
     f_extractor.center_data = args.center_data
     f_extractor.set_data_scale(args.scale)
