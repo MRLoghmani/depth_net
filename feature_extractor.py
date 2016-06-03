@@ -2,7 +2,7 @@
 import pickle
 from argparse import ArgumentParser
 from os.path import join
-import feature_handler
+import feature_handler_v2
 
 def get_arguments():
     parser = ArgumentParser(
@@ -25,7 +25,7 @@ def get_arguments():
 
 def make_features(args):
     print "Starting feature generation procedure..."
-    f_extractor = feature_handler.FeatureCreator(
+    f_extractor = feature_handler_v2.FeatureCreator(
         args.net_proto, args.net_model, args.mean_pixel, args.mean_file, args.use_gpu,
          layer_name=args.layer_name)
     f_extractor.batch_size = args.batch_size
