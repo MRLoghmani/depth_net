@@ -144,7 +144,7 @@ def forward_pass(images, net, transformer, batch_size=1, layer_name='fc7'):
             image_data = transformer.preprocess('data', image)
             net.blobs['data'].data[index] = image_data
         net.forward()
-        features[idx:idx + bsize] = net.blobs[layer_name].data.copy()
+        features[idx:idx + bsize] = np.squeeze(net.blobs[layer_name].data.copy())
         idx += bsize
     print "It took %f" % (time.clock() - start)
     return features
