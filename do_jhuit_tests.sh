@@ -22,8 +22,8 @@ python feature_extractor.py ../JHUIT/JHUIT_normalized/ JHUIT/all_depth.txt $DEPL
 echo Extracting JHUIT colorjet to $COLORJ_NAME
 python feature_extractor.py ../JHUIT/JHUIT_colorjet/ JHUIT/all_depth.txt $DEPLOY $CAFFE_MODEL $COLORJ_NAME --center_data --batch-size $BSIZE
 
-echo Extracting Washington original to $ORIG_NAME
-python feature_extractor.py ../Washington/rgbd-original/ Washington/all_depth_clean.txt $DEPLOY $CAFFE_MODEL $ORIG_NAME --center_data --batch-size $BSIZE
+echo Extracting JHUIT original to $ORIG_NAME
+python feature_extractor.py ../JHUIT/JHUIT/ JHUIT/all_depth.txt $DEPLOY $CAFFE_MODEL $ORIG_NAME --center_data --batch-size $BSIZE
 
 echo "Running SVM on $NORM_NAME"
 SECONDS=0
