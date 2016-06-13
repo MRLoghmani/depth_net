@@ -26,6 +26,7 @@ def get_arguments():
     parser.add_argument("--split_prefix", default='depth_')
     parser.add_argument("--splits", type=int, default=10)
     parser.add_argument("--jobs", type=int, default=2)
+    parser.add_argument("--mkl_threads", type=int, default=2)
     args = parser.parse_args()
     return args
 
@@ -162,7 +163,7 @@ def fuse_features(args):
 if __name__ == '__main__':
     start_time = time.time()
     args = get_arguments()
-    mkl.set_num_threads(2)
+    mkl.set_num_threads(args.mkl_threads)
     print "\n"
     print args
     #import ipdb; ipdb.set_trace()
