@@ -9,6 +9,7 @@ from collections import namedtuple
 from os.path import join
 import time
 from multiprocessing import Process, Array
+import mkl
 
 type_regex = re.compile(ur'_([depthcrop]+)\.png')
 
@@ -60,7 +61,7 @@ def prepare_jobs(split_dir, features, n_splits, jobs):
             new_job.start()
             jobs_running.append(new_job)
         jobs_running[:] = [j for j in jobs_running if is_alive(j)]
-        time.sleep(0.1)
+        time.sleep(0.2)
                 
     print splits_acc[:]
     print np.mean(splits_acc)
@@ -161,6 +162,7 @@ def fuse_features(args):
 if __name__ == '__main__':
     start_time = time.time()
     args = get_arguments()
+    mkl.set_num_threads(2)
     print "\n"
     print args
     #import ipdb; ipdb.set_trace()

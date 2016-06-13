@@ -15,15 +15,22 @@ def get_arguments():
     parser.add_argument("--ext", default="")
     parser.add_argument("--invert", action="store_true")
     parser.add_argument("--buggy", action="store_true")
+    parser.add_argument("--cropRatio", type=float, help="Value between 0 and 1, represents the percentage of the image to keep")
     args = parser.parse_args()
     return args
+
+def crop_from_center(image, cropRatio):
+    (w,h) = image.shape
+    nw = 0.5*w*cropRatio
+    nh = 0.5*h*cropRatio
+    return image[int(w/2 - nw):int(w/2 + nw), int(h/2 - nh):int(h/2 + nh)]
 
 # Attention: the colorized depth image definition is: Red (close), blue(far)
 # For TESTING pre-trained caffemodels use this function provided in this script 
 # Note that the opposite definition can be found in function depth2jet.cpp blue(close), red(far)
 # When re-training the network it should not make a difference, but the second definition, is necessary
 # for noise augmentation. Nan values (which we convert to 0 distance) are therefore dark blue and close objects are also blue.
-def scaleit_experimental(img, invert, buggy):
+def scaleit_experimental(img, invert, buggy, cropRatio):
     img_mask = (img == 0)
     if img is None:
         return None
@@ -34,6 +41,8 @@ def scaleit_experimental(img, invert, buggy):
         imrange = (img.astype('float32')-istats[0])/(istats[1]-istats[0])
     imrange[img_mask] = 0
     imrange= 255.0*imrange
+    if cropRatio is not None:
+        imrange = crop_from_center(imrange, cropRatio)
     imsz = imrange.shape
     mxdim  = np.max(imsz)
 
@@ -80,7 +89,7 @@ if __name__ == "__main__":
             img = h['depth'][:]
         else:
             img = cv2.imread(join(input_dir, img_path), -1);
-        newimg = scaleit_experimental(img, args.invert, args.buggy)
+        newimg = scaleit_experimental(img, args.invert, args.buggy, args.cropRatio)
         if newimg is None:
             continue
         if args.colorjet:

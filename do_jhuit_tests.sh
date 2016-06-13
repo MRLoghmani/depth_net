@@ -3,7 +3,7 @@
 # and runs a few default tests on the washington dataset
 
 # Usage: ./do_jhuit_tests.sh caffemodel [deploy]
-
+echo Working on ${1}
 FEAT_FOLDER=ex_fcs/ # where extracted features are holded
 CAFFE_MODEL=$1
 DEPLOY=${2:-deploy_noshift.txt}  # user provided prototxt or use the default no_shift version
@@ -15,7 +15,8 @@ if [[ $CAFFE_MODEL =~ $job_re ]]; then JOB_ID=${BASH_REMATCH[1]}; fi  # get job 
 NORM_NAME=${FEAT_FOLDER}jhuit_caffe_${JOB_ID}_normalized.pkl
 COLORJ_NAME=${FEAT_FOLDER}jhuit_caffe_${JOB_ID}_colorjet.pkl
 ORIG_NAME=${FEAT_FOLDER}jhuit_caffe_${JOB_ID}_original.pkl
-source activate digits
+echo Starting work on $CAFFE_MODEL
+#source activate svm
 echo Extracting JHUIT normalized to $NORM_NAME
 python feature_extractor.py ../JHUIT/JHUIT_normalized/ JHUIT/all_depth.txt $DEPLOY $CAFFE_MODEL $NORM_NAME --center_data --batch-size $BSIZE
 
