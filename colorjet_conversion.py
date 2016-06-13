@@ -86,7 +86,10 @@ if __name__ == "__main__":
         img_path = i_path.strip()
         if args.h5:
             h = hfile(join(input_dir, img_path))
-            img = h['depth'][:]
+            try:
+                img = h['depth'][:]
+            except:
+                print join(input_dir, img_path)
         else:
             img = cv2.imread(join(input_dir, img_path), -1);
         newimg = scaleit_experimental(img, args.invert, args.buggy, args.cropRatio)
