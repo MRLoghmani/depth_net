@@ -7,6 +7,7 @@ def get_arguments():
     parser = ArgumentParser()
     parser.add_argument("input_file")
     parser.add_argument("output_prefix")
+    parser.add_argument("--exclude_morph", action="store_true")
     args = parser.parse_args()
     return args
 
@@ -28,6 +29,8 @@ if __name__ == '__main__':
             res = re.search(p, line)
             class_name = res.group(1)
             instance = res.group(2)
+            if args.exclude_morph and "morph" in instance.lower():
+                continue
             instance_class = class_name + "_" + instance
             classes.add(instance_class)
 
