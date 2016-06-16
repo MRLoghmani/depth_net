@@ -20,6 +20,7 @@ def get_arguments():
     parser.add_argument("--center_data", action="store_true", help="If set will center the data")
     parser.add_argument("--scale", type=float, default=None)
     parser.add_argument("--gpu_id", type=int, default=0)
+    parser.add_argument("--opt_ext", default="", help="Extension to add to the filenames")
     args = parser.parse_args()
     return args
 
@@ -34,7 +35,7 @@ def make_features(args):
     f_extractor.set_data_scale(args.scale)
     f_extractor.data_prefix = args.data_dir
     all_lines = open(args.filelist, 'rt').readlines()
-    all_lines = [join(args.data_dir, line.strip()) for line in all_lines]
+    all_lines = [join(args.data_dir, line.strip() + args.opt_ext) for line in all_lines]
     # preload all features so that they are handled in batches
     f_extractor.prepare_features(all_lines)
     with open(args.output_filename, 'wb') as f:

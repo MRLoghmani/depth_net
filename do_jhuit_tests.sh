@@ -16,7 +16,7 @@ NORM_NAME=${FEAT_FOLDER}jhuit_caffe_${JOB_ID}_normalized.pkl
 COLORJ_NAME=${FEAT_FOLDER}jhuit_caffe_${JOB_ID}_colorjet.pkl
 ORIG_NAME=${FEAT_FOLDER}jhuit_caffe_${JOB_ID}_original.pkl
 echo Starting work on $CAFFE_MODEL
-#source activate svm
+source activate new_digits
 echo Extracting JHUIT normalized to $NORM_NAME
 python feature_extractor.py ../JHUIT/JHUIT_normalized/ JHUIT/all_depth.txt $DEPLOY $CAFFE_MODEL $NORM_NAME --center_data --batch-size $BSIZE
 
@@ -26,17 +26,18 @@ python feature_extractor.py ../JHUIT/JHUIT_colorjet/ JHUIT/all_depth.txt $DEPLOY
 echo Extracting JHUIT original to $ORIG_NAME
 python feature_extractor.py ../JHUIT/JHUIT/ JHUIT/all_depth.txt $DEPLOY $CAFFE_MODEL $ORIG_NAME --center_data --batch-size $BSIZE
 
+source activate general
 echo "Running SVM on $NORM_NAME"
 SECONDS=0
-python svm_baseline.py JHUIT/ $NORM_NAME --splits 1 --split_prefix jhuit_depth_
+python -u svm_baseline.py JHUIT/ $NORM_NAME --splits 1 --split_prefix jhuit_depth_
 echo "Took $SECONDS seconds"
 
 SECONDS=0
 echo "Running SVM on $COLORJ_NAME"
-python svm_baseline.py JHUIT/ $COLORJ_NAME --splits 1 --split_prefix jhuit_depth_
+python -u svm_baseline.py JHUIT/ $COLORJ_NAME --splits 1 --split_prefix jhuit_depth_
 echo "Took $SECONDS seconds"
 
 SECONDS=0
 echo "Running SVM on $ORIG_NAME"
-python svm_baseline.py JHUIT/ $ORIG_NAME --splits 1 --split_prefix jhuit_depth_
+python -u svm_baseline.py JHUIT/ $ORIG_NAME --splits 1 --split_prefix jhuit_depth_
 echo "Took $SECONDS seconds"

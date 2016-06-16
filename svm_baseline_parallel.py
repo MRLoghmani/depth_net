@@ -68,7 +68,8 @@ def prepare_jobs(split_dir, features, n_splits, jobs):
     print np.mean(splits_acc)
 
 def run_split(split_dir, features, n_splits, splits_acc, x):
-    classes = 51
+#    import ipdb; ipdb.set_trace()
+    classes = 200
     f_size = features[features.keys()[0]].shape[0]
     print "Loading split %d" % x
     train_lines = open(join(split_dir, args.split_prefix + 'train_split_' + str(x) + '.txt'), 'rt').readlines()
