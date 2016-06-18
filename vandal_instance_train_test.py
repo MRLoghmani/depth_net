@@ -33,7 +33,7 @@ if __name__ == '__main__':
             if args.exclude_morph and "_morph" in instance.lower():
                 continue
             if args.include_morph and "_morph" in instance.lower():
-                instance = instance[instance.index("_morph")]
+                instance = instance[:instance.index("_morph")]
             instance_class = class_name + "_" + instance
             classes.add(instance_class)
 
