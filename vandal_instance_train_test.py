@@ -8,6 +8,7 @@ def get_arguments():
     parser.add_argument("input_file")
     parser.add_argument("output_prefix")
     parser.add_argument("--exclude_morph", action="store_true")
+    parser.add_argument("--include_morph", action="store_true")
     args = parser.parse_args()
     return args
 
@@ -29,8 +30,10 @@ if __name__ == '__main__':
             res = re.search(p, line)
             class_name = res.group(1)
             instance = res.group(2)
-            if args.exclude_morph and "morph" in instance.lower():
+            if args.exclude_morph and "_morph" in instance.lower():
                 continue
+            if args.include_morph and "_morph" in instance.lower():
+                instance = instance[instance.index("_morph")]
             instance_class = class_name + "_" + instance
             classes.add(instance_class)
 
