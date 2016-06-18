@@ -9,6 +9,7 @@ def get_arguments():
     parser.add_argument("output_prefix")
     parser.add_argument("--exclude_morph", action="store_true")
     parser.add_argument("--include_morph", action="store_true")
+    parser.add_argument("--cap", type=int)
     args = parser.parse_args()
     return args
 
@@ -24,7 +25,7 @@ if __name__ == '__main__':
     test_lines = []
 #    p = re.compile(ur'\/(.*)\/.*(\d)_\d{1,3}_(depth|rgb)crop\.png')  # group 1 is class, group 2 is angle seq
     p = re.compile(ur'\/(.*)\/(.*)\/')  # group 1 is class, 2 is instance
-    classes = set()
+    classes = {}
     with open(args.input_file) as tmp:
         for line in tmp:
             res = re.search(p, line)
@@ -35,7 +36,10 @@ if __name__ == '__main__':
             if args.include_morph and "_morph" in instance.lower():
                 instance = instance[:instance.index("_morph")]
             instance_class = class_name + "_" + instance
-            classes.add(instance_class)
+            samples = classes.get(instance_class, 0)
+            if args.cap and samples >= args.cap:
+                continue  # just skip
+            classes[instance_class] = samples + 1
 
 
             add_to = train_lines
