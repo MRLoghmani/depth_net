@@ -84,14 +84,17 @@ if __name__ == "__main__":
     for i_path in images:
 #        import ipdb; ipdb.set_trace()
         img_path = i_path.strip()
+        full_path = join(input_dir, img_path)
         if args.h5:
-            h = hfile(join(input_dir, img_path))
+            h = hfile(full_path)
             try:
                 img = h['depth'][:]
             except:
-                print join(input_dir, img_path)
+                print full_path
         else:
-            img = cv2.imread(join(input_dir, img_path), -1);
+            img = cv2.imread(full_path, -1);
+        if args.get_single_channel:
+            img = img[0,:,:]
         newimg = scaleit_experimental(img, args.invert, args.buggy, args.cropRatio)
         if newimg is None:
             continue

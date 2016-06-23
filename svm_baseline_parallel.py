@@ -27,6 +27,7 @@ def get_arguments():
     parser.add_argument("--splits", type=int, default=10)
     parser.add_argument("--jobs", type=int, default=2)
     parser.add_argument("--mkl_threads", type=int, default=2)
+    parser.add_argument("--classes", type=int, default=51)
     args = parser.parse_args()
     return args
 
@@ -48,12 +49,12 @@ def is_alive(job):
     return status
 
 
-def prepare_jobs(split_dir, features, n_splits, jobs):
+def prepare_jobs(split_dir, features, n_splits, jobs, classes):
     jobs_todo = []
     jobs_running = []
     splits_acc = Array('d', range(n_splits))
     for i in range(n_splits):
-        jobs_todo.append(Process(target=run_split, name="Split"+str(i), args=(split_dir,features,n_splits, splits_acc, i)))
+        jobs_todo.append(Process(target=run_split, name="Split"+str(i), args=(split_dir,features,n_splits, splits_acc, i, classes)))
     jobs_todo.reverse()  # just to get the jobs in expected order
     while len(jobs_running) + len(jobs_todo):  # while there are still jobs running or to run 
         if len(jobs_todo) and len(jobs_running) < jobs:
@@ -62,14 +63,13 @@ def prepare_jobs(split_dir, features, n_splits, jobs):
             new_job.start()
             jobs_running.append(new_job)
         jobs_running[:] = [j for j in jobs_running if is_alive(j)]
-        time.sleep(0.2)
+        time.sleep(0.3)
                 
     print splits_acc[:]
     print np.mean(splits_acc)
 
-def run_split(split_dir, features, n_splits, splits_acc, x):
+def run_split(split_dir, features, n_splits, splits_acc, x, classes):
 #    import ipdb; ipdb.set_trace()
-    classes = 200
     f_size = features[features.keys()[0]].shape[0]
     print "Loading split %d" % x
     train_lines = open(join(split_dir, args.split_prefix + 'train_split_' + str(x) + '.txt'), 'rt').readlines()
@@ -173,6 +173,6 @@ if __name__ == '__main__':
     if features is None:
         print "Features not found or corruped - exiting"
         quit()
-    prepare_jobs(args.split_dir, features, args.splits, args.jobs)
+    prepare_jobs(args.split_dir, features, args.splits, args.jobs, args.classes)
     elapsed_time = time.time() - start_time
     print " Total elapsed time: %d " % elapsed_time

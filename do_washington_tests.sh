@@ -6,10 +6,11 @@
 
 FEAT_FOLDER=ex_fcs/ # where extracted features are holded
 CAFFE_MODEL=$1
+#DEPLOY=${2:-instance_deploy.prototxt}  # user provided prototxt or use the default no_shift version
 DEPLOY=${2:-deploy_noshift.txt}  # user provided prototxt or use the default no_shift version
 JOB_ID=${3:-default}
 N_SPLITS=10
-BSIZE=256
+BSIZE=128
 echo Working on $1
 job_re='jobs\/(.+)\/sna'  # regex to find job id from caffemodel
 if [[ $CAFFE_MODEL =~ $job_re ]]; then JOB_ID=${BASH_REMATCH[1]}; fi  # get job id
@@ -22,7 +23,7 @@ python -u feature_extractor.py ../Washington/rgbd-normalized_gray/ Washington/al
 echo Extracting Washington original to $ORIG_NAME
 python -u feature_extractor.py ../Washington/rgbd-original/ Washington/all_depth_clean.txt $DEPLOY $CAFFE_MODEL $ORIG_NAME --center_data --batch-size $BSIZE
 
-source activate general
+source activate svm
 echo "Running SVM on $NORM_NAME"
 SECONDS=0
 python -u svm_baseline_parallel.py Washington/splits/ $NORM_NAME --splits $N_SPLITS --jobs 4
