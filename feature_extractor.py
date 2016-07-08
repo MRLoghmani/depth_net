@@ -16,7 +16,7 @@ def get_arguments():
     parser.add_argument("--mean_file")
     parser.add_argument("--batch-size", type=int, default=256)
     parser.add_argument("--layer_name", help="Default is FC7", default='fc7')
-    parser.add_argument("--use_gpu", default=True, help="If set false, will force CPU inference")
+    parser.add_argument("--use_cpu", action="store_true", help="If set false, will force CPU inference")
     parser.add_argument("--center_data", action="store_true", help="If set will center the data")
     parser.add_argument("--scale", type=float, default=None)
     parser.add_argument("--gpu_id", type=int, default=0)
@@ -28,7 +28,7 @@ def get_arguments():
 def make_features(args):
     print "Starting feature generation procedure..."
     f_extractor = feature_handler_v2.FeatureCreator(
-        args.net_proto, args.net_model, args.mean_pixel, args.mean_file, args.use_gpu,
+        args.net_proto, args.net_model, args.mean_pixel, args.mean_file, not args.use_cpu,
          layer_name=args.layer_name, gpu_id=args.gpu_id)
     f_extractor.batch_size = args.batch_size
     f_extractor.center_data = args.center_data

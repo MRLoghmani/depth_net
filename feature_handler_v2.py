@@ -18,6 +18,7 @@ def get_net(caffemodel, deploy_file, use_gpu=True, GPU_ID=0):
     Keyword arguments:
     use_gpu -- if True, use the GPU for inference
     """
+    print use_gpu is False
     if use_gpu:
         print "Using GPU %d" % GPU_ID
         caffe.set_device(GPU_ID)
@@ -155,6 +156,7 @@ class FeatureCreator:
     and returns them when requested"""
 
     def __init__(self, net_proto, net_weights, mean_pixel=None, mean_file=None, use_gpu=True, layer_name='fc7', verbose=False, gpu_id=0):
+	print use_gpu
         self.net = get_net(net_weights, net_proto, use_gpu, gpu_id)
         self.transformer = get_transformer(
             net_proto, mean_pixel=mean_pixel, mean_file=mean_file)

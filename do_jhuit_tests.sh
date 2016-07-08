@@ -16,9 +16,9 @@ NORM_NAME=${FEAT_FOLDER}jhuit_caffe_${JOB_ID}_normalized.pkl
 COLORJ_NAME=${FEAT_FOLDER}jhuit_caffe_${JOB_ID}_colorjet.pkl
 ORIG_NAME=${FEAT_FOLDER}jhuit_caffe_${JOB_ID}_original.pkl
 echo Starting work on $CAFFE_MODEL
-source activate new_digits
+source activate digits_bvlc
 echo Extracting JHUIT normalized to $NORM_NAME
-python feature_extractor.py ../JHUIT/JHUIT_normalized/ JHUIT/all_depth.txt $DEPLOY $CAFFE_MODEL $NORM_NAME --center_data --batch-size $BSIZE
+python feature_extractor.py ../JHUIT/JHUIT_normalized/ JHUIT/all_depth.txt $DEPLOY $CAFFE_MODEL $NORM_NAME --center_data --batch-size $BSIZE --use_cpu
 
 #echo Extracting JHUIT colorjet to $COLORJ_NAME
 #python feature_extractor.py ../JHUIT/JHUIT_colorjet/ JHUIT/all_depth.txt $DEPLOY $CAFFE_MODEL $COLORJ_NAME --center_data --batch-size $BSIZE
@@ -26,7 +26,8 @@ python feature_extractor.py ../JHUIT/JHUIT_normalized/ JHUIT/all_depth.txt $DEPL
 echo Extracting JHUIT original to $ORIG_NAME
 python feature_extractor.py ../JHUIT/JHUIT/ JHUIT/all_depth.txt $DEPLOY $CAFFE_MODEL $ORIG_NAME --center_data --batch-size $BSIZE
 
-source activate svm
+#source activate svm
+source deactivate
 echo "Running SVM on $NORM_NAME"
 SECONDS=0
 python -u svm_baseline_parallel.py JHUIT/ $NORM_NAME --splits 1 --split_prefix jhuit_depth_ --classes 49 --mkl_threads 5
