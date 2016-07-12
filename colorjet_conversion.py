@@ -94,7 +94,7 @@ if __name__ == "__main__":
         else:
             img = cv2.imread(full_path, -1);
         if args.get_single_channel:
-            img = img[0,:,:]
+            img = img[:, :, 0]  # img = img[0,:,:]
         newimg = scaleit_experimental(img, args.invert, args.buggy, args.cropRatio)
         if newimg is None:
             continue

@@ -18,20 +18,20 @@ if [[ $CAFFE_MODEL =~ $job_re ]]; then JOB_ID=${BASH_REMATCH[1]}; fi  # get job 
 
 NORM_NAME=${FEAT_FOLDER}vandal_${JOB_ID}_normalized.pkl
 ORIG_NAME=${FEAT_FOLDER}vandal_${JOB_ID}_original.pkl
-source activate digits
+source activate digits_bvlc
 echo Extracting Washington normalized to $NORM_NAME
-python -u feature_extractor.py ../Washington/rgbd-normalized_gray/ Washington/all_depth_clean.txt $DEPLOY $CAFFE_MODEL $NORM_NAME --center_data --batch-size $BSIZE
+python -u feature_extractor.py ../Washington/rgbd-normalized_gray/ Washington/all_depth_clean.txt $DEPLOY $CAFFE_MODEL $NORM_NAME --center_data --batch-size $BSIZE --layer_name pool5
 echo Extracting Washington original to $ORIG_NAME
-python -u feature_extractor.py ../Washington/rgbd-original/ Washington/all_depth_clean.txt $DEPLOY $CAFFE_MODEL $ORIG_NAME --center_data --batch-size $BSIZE
+python -u feature_extractor.py ../Washington/rgbd-original/ Washington/all_depth_clean.txt $DEPLOY $CAFFE_MODEL $ORIG_NAME --center_data --batch-size $BSIZE --layer_name pool5
 
 #source activate svm
 source deactivate
 echo "Running SVM on $NORM_NAME"
 SECONDS=0
-python -u svm_baseline.py Washington/splits/ $NORM_NAME --splits $N_SPLITS #--jobs 2
+python -u svm_baseline_parallel.py Washington/splits/ $NORM_NAME --splits $N_SPLITS --jobs 4
 echo "Took $SECONDS seconds"
 
 SECONDS=0
 echo "Running SVM on $ORIG_NAME"
-python -u svm_baseline.py Washington/splits/ $ORIG_NAME --splits $N_SPLITS # --jobs 4
+python -u svm_baseline_parallel.py Washington/splits/ $ORIG_NAME --splits $N_SPLITS --jobs 4
 echo "Took $SECONDS seconds"

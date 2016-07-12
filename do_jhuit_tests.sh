@@ -18,13 +18,13 @@ ORIG_NAME=${FEAT_FOLDER}jhuit_caffe_${JOB_ID}_original.pkl
 echo Starting work on $CAFFE_MODEL
 source activate digits_bvlc
 echo Extracting JHUIT normalized to $NORM_NAME
-python feature_extractor.py ../JHUIT/JHUIT_normalized/ JHUIT/all_depth.txt $DEPLOY $CAFFE_MODEL $NORM_NAME --center_data --batch-size $BSIZE --use_cpu
+python feature_extractor.py ../JHUIT/JHUIT_normalized/ JHUIT/all_depth.txt $DEPLOY $CAFFE_MODEL $NORM_NAME --center_data --batch-size $BSIZE --layer_name fc6
 
 #echo Extracting JHUIT colorjet to $COLORJ_NAME
-#python feature_extractor.py ../JHUIT/JHUIT_colorjet/ JHUIT/all_depth.txt $DEPLOY $CAFFE_MODEL $COLORJ_NAME --center_data --batch-size $BSIZE
+#python feature_extractor.py ../JHUIT/JHUIT_colorjet/ JHUIT/all_depth.txt $DEPLOY $CAFFE_MODEL $COLORJ_NAME --center_data --batch-size $BSIZE  --layer_name fc6
 
 echo Extracting JHUIT original to $ORIG_NAME
-python feature_extractor.py ../JHUIT/JHUIT/ JHUIT/all_depth.txt $DEPLOY $CAFFE_MODEL $ORIG_NAME --center_data --batch-size $BSIZE
+python feature_extractor.py ../JHUIT/JHUIT/ JHUIT/all_depth.txt $DEPLOY $CAFFE_MODEL $ORIG_NAME --center_data --batch-size $BSIZE  --layer_name fc6
 
 #source activate svm
 source deactivate
