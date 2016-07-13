@@ -9,6 +9,7 @@ import scipy.misc
 import time
 from tqdm import tqdm
 
+
 def get_net(caffemodel, deploy_file, use_gpu=True, GPU_ID=0):
     """
     Returns an instance of caffe.Net
@@ -63,7 +64,8 @@ def get_transformer(deploy_file, mean_file=None, mean_pixel=None):
             blob.MergeFromString(infile.read())
             if blob.HasField('shape'):
                 blob_dims = blob.shape
-                assert len(blob_dims) == 4, 'Shape should have 4 dimensions - shape is "%s"' % blob.shape
+                assert len(
+                    blob_dims) == 4, 'Shape should have 4 dimensions - shape is "%s"' % blob.shape
             elif blob.HasField('num') and blob.HasField('channels') and \
                     blob.HasField('height') and blob.HasField('width'):
                 blob_dims = (blob.num, blob.channels, blob.height, blob.width)
@@ -129,9 +131,10 @@ def forward_pass(images, net, transformer, batch_size=1, layer_name='fc7'):
             caffe_images.append(image)
 
     dims = transformer.inputs['data'][1:]
-    import ipdb; ipdb.set_trace()
-    fsize = net.blobs[layer_name].data.shape[1]
-    features = np.empty((len(images), fsize), dtype='float32') 
+#    import ipdb; ipdb.set_trace()
+    fsize = net.blobs[layer_name].data.size / \
+        net.blobs[layer_name].data.shape[0]
+    features = np.empty((len(images), fsize), dtype='float32')
     todoChunks = [caffe_images[x:x + batch_size]
                   for x in xrange(0, len(caffe_images), batch_size)]
     start = time.clock()
@@ -145,7 +148,7 @@ def forward_pass(images, net, transformer, batch_size=1, layer_name='fc7'):
             image_data = transformer.preprocess('data', image)
             net.blobs['data'].data[index] = image_data
         net.forward()
-        features[idx:idx + bsize] = np.squeeze(net.blobs[layer_name].data.copy())
+        features[idx:idx + bsize] = net.blobs[layer_name].data.reshape(-1, net.blobs[layer_name].data.size / bsize).copy()
         idx += bsize
     print "It took %f" % (time.clock() - start)
     return features
@@ -169,8 +172,8 @@ class FeatureCreator:
         self.data_prefix = ''
 
     def prepare_features(self, image_files):
-        #import ipdb; ipdb.set_trace()
-        old_batch_size, channels, height, width = self.transformer.inputs['data']
+        old_batch_size, channels, height, width = self.transformer.inputs[
+            'data']
         if channels == 3:
             mode = 'RGB'
         elif channels == 1:
@@ -178,22 +181,26 @@ class FeatureCreator:
         else:
             raise ValueError('Invalid number for channels: %s' % channels)
         print "Loading images"
-        images = [load_image(image_file, height, width, mode) for image_file in image_files]
-	mean = 0.0
-	for im in images:
-	    mean += im.mean()
-	mean = self.scale * mean / len(images)
-	print "Image mean: %f" % mean
+        images = [load_image(image_file, height, width, mode)
+                  for image_file in image_files]
+        mean = 0.0
+        for im in images:
+            mean += im.mean()
+        mean = self.scale * mean / len(images)
+        print "Image mean: %f" % mean
         if self.center_data:
-            self.transformer.set_mean('data', np.ones(self.transformer.inputs['data'][1]) * mean)
+            self.transformer.set_mean('data', np.ones(
+                self.transformer.inputs['data'][1]) * mean)
             print "Will center data"
         # Classify the image
         print "Extracting features"
-        feats = forward_pass(images, self.net,  self.transformer, batch_size=self.batch_size, layer_name=self.layer_name)
+        feats = forward_pass(images, self.net,  self.transformer,
+                             batch_size=self.batch_size, layer_name=self.layer_name)
         i = 0
         # load the features in a map with their path as key
         for f in image_files:
-            short_name = f.replace(self.data_prefix, '')  # saves only the relative path
+            # saves only the relative path
+            short_name = f.replace(self.data_prefix, '')
             if short_name[0] == '/':
                 short_name = short_name[1:]
             self.features[short_name] = feats[i].reshape(feats[i].size)
@@ -205,12 +212,13 @@ class FeatureCreator:
         if feats is None:
             print "!!! Missing features for " + image_path
         return feats
-      
+
     def set_data_scale(self, scale):
-	if scale is None: return
-	self.transformer.set_raw_scale('data', scale)
-	print "Set transformer raw data scale to %f" % scale
-	self.scale = scale
+        if scale is None:
+            return
+        self.transformer.set_raw_scale('data', scale)
+        print "Set transformer raw data scale to %f" % scale
+        self.scale = scale
 
     def do_forward_pass(self, data):
-        return forward_pass(data, self.net, self.transformer,self.verbose, batch_size=self.batch_size, layer_name=self.layer_name)
+        return forward_pass(data, self.net, self.transformer, self.verbose, batch_size=self.batch_size, layer_name=self.layer_name)
