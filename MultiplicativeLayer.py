@@ -16,7 +16,7 @@ class Multiplicative(caffe.Layer):
         # Copy shape from bottom
         top[0].reshape(*bottom[0].data.shape)
 
-    def _bak_forward(self, bottom, top):
+    def forward(self, bottom, top):
         # Copy all of the data
         app = bottom[0].data[...]
         # Take a number
@@ -25,7 +25,7 @@ class Multiplicative(caffe.Layer):
         # Scale the values
         top[0].data[...] = app * scale + offset
 
-    def forward(self, bottom, top):
+    def _tmp_forward(self, bottom, top):
         app = bottom[0].data[...]
         batch_size = app.shape[1]
         for i in range(0, batch_size):

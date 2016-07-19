@@ -95,7 +95,11 @@ def load_image(path, height, width, mode='RGB'):
         (RGB for color or L for grayscale)
     """
     image = PIL.Image.open(path)
-    image = image.resize((width, height), PIL.Image.BILINEAR)
+    try:
+        image = image.resize((width, height), PIL.Image.BILINEAR)
+    except:
+        print "Problem with image %s" % path
+        return None
     if image.mode == 'I':
         tmp = np.array(image)
         if mode == 'RGB':
@@ -181,8 +185,10 @@ class FeatureCreator:
         else:
             raise ValueError('Invalid number for channels: %s' % channels)
         print "Loading images"
-        images = [load_image(image_file, height, width, mode)
-                  for image_file in image_files]
+        images = []
+        for image_file in image_files:
+            im = load_image(image_file, height, width, mode)
+            images.append(im)
         mean = 0.0
         for im in images:
             mean += im.mean()

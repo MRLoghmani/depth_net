@@ -1,18 +1,17 @@
-
 #!/bin/bash
 # This script accepts a caffemodel (and optionally a deploy)
 # and runs a few default tests on the washington dataset
 
 # Usage: ./do_washington_tests.sh caffemodel [deploy]
-
+echo Working on ${1}
 FEAT_FOLDER=ex_fcs/ # where extracted features are holded
 CAFFE_MODEL=$1
 #DEPLOY=${2:-instance_deploy.prototxt}  # user provided prototxt or use the default no_shift version
 DEPLOY=${2:-deploy_noshift.txt}  # user provided prototxt or use the default no_shift version
 JOB_ID=${3:-default}
+layer=${4:-pool5}
 N_SPLITS=10
-BSIZE=128
-echo Working on $1
+BSIZE=256
 job_re='jobs\/(.+)\/sna'  # regex to find job id from caffemodel
 if [[ $CAFFE_MODEL =~ $job_re ]]; then JOB_ID=${BASH_REMATCH[1]}; fi  # get job id
 
@@ -20,9 +19,9 @@ NORM_NAME=${FEAT_FOLDER}vandal_${JOB_ID}_normalized.pkl
 ORIG_NAME=${FEAT_FOLDER}vandal_${JOB_ID}_original.pkl
 source activate digits_bvlc
 echo Extracting Washington normalized to $NORM_NAME
-python -u feature_extractor.py ../Washington/rgbd-normalized_gray/ Washington/all_depth_clean.txt $DEPLOY $CAFFE_MODEL $NORM_NAME --center_data --batch-size $BSIZE --layer_name pool5
+python -u feature_extractor.py ../Washington/rgbd-normalized_gray/ Washington/all_depth_clean.txt $DEPLOY $CAFFE_MODEL $NORM_NAME --center_data --batch-size $BSIZE --layer_name ${layer}
 echo Extracting Washington original to $ORIG_NAME
-python -u feature_extractor.py ../Washington/rgbd-original/ Washington/all_depth_clean.txt $DEPLOY $CAFFE_MODEL $ORIG_NAME --center_data --batch-size $BSIZE --layer_name pool5
+python -u feature_extractor.py ../Washington/rgbd-original/ Washington/all_depth_clean.txt $DEPLOY $CAFFE_MODEL $ORIG_NAME --center_data --batch-size $BSIZE --layer_name ${layer}
 
 #source activate svm
 source deactivate

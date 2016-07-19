@@ -10,6 +10,7 @@ from os.path import join
 import time
 from multiprocessing import Process, Array
 import mkl
+from sklearn.decomposition import PCA
 
 type_regex = re.compile(ur'_([depthcrop]+)\.png')
 
@@ -21,13 +22,16 @@ def get_arguments():
     parser = ArgumentParser(
         description='SVM based classification for whole images.')
     parser.add_argument("split_dir")
-    parser.add_argument("feature_dict", nargs='+', help="Can be one or two feature dictionaries")
-    parser.add_argument("--conf_name", default=None, help="If defined will save confusions matrices for each split at give output")
+    parser.add_argument("feature_dict", nargs='+',
+                        help="Can be one or two feature dictionaries")
+    parser.add_argument("--conf_name", default=None,
+                        help="If defined will save confusions matrices for each split at give output")
     parser.add_argument("--split_prefix", default='depth_')
     parser.add_argument("--splits", type=int, default=10)
     parser.add_argument("--jobs", type=int, default=2)
     parser.add_argument("--mkl_threads", type=int, default=2)
     parser.add_argument("--classes", type=int, default=51)
+    parser.add_argument("--PCA_dims", type=int, default=None)
     args = parser.parse_args()
     return args
 
@@ -49,14 +53,15 @@ def is_alive(job):
     return status
 
 
-def prepare_jobs(split_dir, features, n_splits, jobs, classes):
+def prepare_jobs(split_dir, features, n_splits, jobs, classes, PCA_dims):
     jobs_todo = []
     jobs_running = []
     splits_acc = Array('d', range(n_splits))
     for i in range(n_splits):
-        jobs_todo.append(Process(target=run_split, name="Split"+str(i), args=(split_dir,features,n_splits, splits_acc, i, classes)))
+        jobs_todo.append(Process(target=run_split, name="Split" + str(i),
+                                 args=(split_dir, features, n_splits, splits_acc, i, classes, PCA_dims)))
     jobs_todo.reverse()  # just to get the jobs in expected order
-    while len(jobs_running) + len(jobs_todo):  # while there are still jobs running or to run 
+    while len(jobs_running) + len(jobs_todo):  # while there are still jobs running or to run
         if len(jobs_todo) and len(jobs_running) < jobs:
             print "Starting new job"
             new_job = jobs_todo.pop()
@@ -64,16 +69,19 @@ def prepare_jobs(split_dir, features, n_splits, jobs, classes):
             jobs_running.append(new_job)
         jobs_running[:] = [j for j in jobs_running if is_alive(j)]
         time.sleep(0.3)
-                
+
     print splits_acc[:]
     print np.mean(splits_acc)
 
-def run_split(split_dir, features, n_splits, splits_acc, x, classes):
-#    import ipdb; ipdb.set_trace()
+
+def run_split(split_dir, features, n_splits, splits_acc, x, classes, PCA_dims):
+    #    import ipdb; ipdb.set_trace()
     f_size = features[features.keys()[0]].shape[0]
     print "Loading split %d" % x
-    train_lines = open(join(split_dir, args.split_prefix + 'train_split_' + str(x) + '.txt'), 'rt').readlines()
-    test_lines = open(join(split_dir, args.split_prefix + 'test_split_' + str(x) + '.txt'), 'rt').readlines()
+    train_lines = open(join(split_dir, args.split_prefix +
+                            'train_split_' + str(x) + '.txt'), 'rt').readlines()
+    test_lines = open(join(split_dir, args.split_prefix +
+                           'test_split_' + str(x) + '.txt'), 'rt').readlines()
     # pre allocate space for features
     training_samples = get_samples_per_class(train_lines, classes)
     testing_samples = get_samples_per_class(test_lines, classes)
@@ -95,31 +103,50 @@ def run_split(split_dir, features, n_splits, splits_acc, x, classes):
         nClass = int(classLabel)
         test_features[nClass][ccounter[nClass]] = features[path]
         ccounter[nClass] += 1
-    train_labels = np.hstack([np.ones(data.shape[0]) * c for c, data in enumerate(train_features)]).ravel()
-    test_labels = np.hstack([np.ones(data.shape[0]) * c for c, data in enumerate(test_features)]).ravel()
+    train_labels = np.hstack(
+        [np.ones(data.shape[0]) * c for c, data in enumerate(train_features)]).ravel()
+    test_labels = np.hstack(
+        [np.ones(data.shape[0]) * c for c, data in enumerate(test_features)]).ravel()
     test_features = np.vstack(test_features)
     train_features = np.vstack(train_features)
     print "Loaded %s train and %s test - starting svm"
-    splits_acc[x] = do_svm(LoadedData(train_features, train_labels, test_features, test_labels), x)
+    splits_acc[x] = do_svm(LoadedData(
+        train_features, train_labels, test_features, test_labels), x, PCA_dims)
 
-def do_svm(loaded_data, split_n):
+
+def do_svm(loaded_data, split_n, PCA_dims=None):
     #    loaded_data = load_split(args.input_dir, args.train_file, args.test_file)
     print "Fitting SVM to data - train data %s, test data %s" \
         % (str(loaded_data.train_patches.shape), str(loaded_data.test_patches.shape))
-    clf = svm.LinearSVC(dual=False)
-    print "Feature mean %f and std %f" % (loaded_data.train_patches.mean(), loaded_data.train_patches.std())
-    start = time.clock()
-    clf.fit(loaded_data.train_patches, loaded_data.train_labels)
-    res = clf.predict(loaded_data.test_patches)
-    confusion = confusion_matrix( loaded_data.test_labels, res)
+    if PCA_dims:
+        print "Will perform PCA to reduce dimensions to %d" % PCA_dims
+        start = time.time()
+        pca = PCA(n_components=PCA_dims)
+        pca.fit(loaded_data.train_patches)
+        print "PCA computed, now transforming"
+        train_data = pca.transform(loaded_data.train_patches)
+        test_data = pca.transform(loaded_data.train_patches)
+        end = time.time()
+        print "It took %f seconds to perform PCA" % (end - start)
+        print "Fitting SVM to data - train data %s, test data %s" \
+            % (str(train_data.shape), str(test_data.shape))
+    else:
+        train_data = loaded_data.train_patches
+        test_data = loaded_data.test_patches
+    print "Feature mean %f and std %f" % (train_data.mean(), train_data.std())
+    start = time.time()
+    clf = svm.LinearSVC(dual=False)  # C=0.00001 good for JHUIT
+    clf.fit(train_data, loaded_data.train_labels)
+    res = clf.predict(test_data)
+    confusion = confusion_matrix(loaded_data.test_labels, res)
     if conf_path is not None:
         np.savetxt(conf_path + '_' + str(split_n) + '.csv', confusion)
     correct = (res == loaded_data.test_labels).sum()
-    score = clf.score(loaded_data.test_patches, loaded_data.test_labels)
-    end = time.clock()
+    end = time.time()
     print "Split " + str(split_n) + " Got " + str((100.0 * correct) / loaded_data.test_labels.size) \
-        + "% correct, took " + str(end - start) + " seconds " + str(score)
-    return score
+        + "% correct, took " + str(end - start) + " seconds "
+    return (100.0 * correct) / loaded_data.test_labels.size
+
 
 def get_features(args):
     print "Loading precomputed features"
@@ -132,13 +159,17 @@ def get_features(args):
     except:
         return None
 
+
 def get_type_from_string(path):
     return re.search(type_regex, path).group(1)
 
+
 def get_split_type(args):
-    firstline = open(join(args.split_dir, args.split_prefix + 'train_split_0.txt'), 'rt').readlines()[0]
+    firstline = open(join(args.split_dir, args.split_prefix +
+                          'train_split_0.txt'), 'rt').readlines()[0]
     path = firstline.split()[0].strip()
     return get_type_from_string(path)
+
 
 def fuse_features(args):
     feats = args.feature_dict
@@ -173,6 +204,7 @@ if __name__ == '__main__':
     if features is None:
         print "Features not found or corruped - exiting"
         quit()
-    prepare_jobs(args.split_dir, features, args.splits, args.jobs, args.classes)
+    prepare_jobs(args.split_dir, features, args.splits,
+                 args.jobs, args.classes, args.PCA_dims)
     elapsed_time = time.time() - start_time
     print " Total elapsed time: %d " % elapsed_time
