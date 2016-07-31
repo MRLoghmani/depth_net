@@ -150,7 +150,7 @@ def run_split(split_dir, features, n_splits, splits_acc, x, classes, runParams):
     (test_features, test_labels) = load_split(join(split_dir,
                                                    args.split_prefix + 'test_split_' + str(x) + '.txt'), features, classes)
     print "Loaded %s train and %s test - starting svm"
-    save_kernel_matrix(train_features, test_features, train_labels, test_labels, runParams.out_name)
+    #save_kernel_matrix(train_features, test_features, train_labels, test_labels, runParams.out_name)
     splits_acc[x] = do_svm(LoadedData(
         train_features, train_labels, test_features, test_labels), x, runParams)
 

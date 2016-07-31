@@ -58,6 +58,11 @@ def run_washington_splits(split_dir, features, n_splits):
         for line in train_lines:
             [path, classLabel] = line.split()
             nClass = int(classLabel)
+#	    print line
+#	    print path
+#	    print classLabel
+#	    import code
+#	    code.interact(local=locals())
             train_features[nClass][ccounter[nClass]] = features[path]
             ccounter[nClass] += 1
         ccounter = np.zeros(classes, dtype='int')

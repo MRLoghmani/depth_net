@@ -121,6 +121,17 @@ layer {
   top: "conv4"
 }
 layer {
+  name: "pool4"
+  type: "Pooling"
+  bottom: "conv4"
+  top: "pool4"
+  pooling_param {
+    pool: MAX
+    kernel_size: 4
+    stride: 3
+  }
+}
+layer {
   name: "conv5"
   type: "Convolution"
   bottom: "conv4"

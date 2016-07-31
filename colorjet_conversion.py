@@ -1,3 +1,4 @@
+import warnings
 from argparse import ArgumentParser
 import numpy as np
 import cv2
@@ -38,7 +39,16 @@ def scaleit_experimental(img, invert, buggy, cropRatio):
     if invert:
         imrange =  1.0-(img.astype('float32')-istats[0])/(istats[1]-istats[0])
     else:
-        imrange = (img.astype('float32')-istats[0])/(istats[1]-istats[0])
+	with warnings.catch_warnings():
+	    warnings.filterwarnings('error')
+	    try:
+                imrange = (img.astype('float32')-istats[0])/(istats[1]-istats[0])
+            except Warning as e:
+		print('DIVIDING BY ZERO!Python does not generate an exception but a simple warning.', e)
+					##DIVIDING BY ZERO!Python does not generate an exception but a simple warning.
+					#I decided to put the entire image to zero.
+                imrange = (img.astype('float32')-istats[0])
+		
     imrange[img_mask] = 0
     imrange= 255.0*imrange
     if cropRatio is not None:
@@ -93,10 +103,12 @@ if __name__ == "__main__":
                 print full_path
         else:
             img = cv2.imread(full_path, -1);
-        if args.get_single_channel:
-            img = img[:, :, 0]  # img = img[0,:,:]
+       # if args.get_single_channel:
+       # img = img[:, :, 0]  # img = img[0,:,:]
         newimg = scaleit_experimental(img, args.invert, args.buggy, args.cropRatio)
+
         if newimg is None:
+	    print 'newimg is None'
             continue
         if args.colorjet:
             newimg = cv2.applyColorMap(newimg, cv2.COLORMAP_JET)
