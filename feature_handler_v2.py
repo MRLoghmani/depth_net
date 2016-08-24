@@ -100,6 +100,10 @@ def load_image(path, height, width, mode='RGB'):
     except:
         print "Problem with image %s" % path
         return None
+    return convert_image(image, mode)
+
+
+def convert_image(image, mode):
     if image.mode == 'I':
         tmp = np.array(image)
         if mode == 'RGB':
@@ -152,7 +156,8 @@ def forward_pass(images, net, transformer, batch_size=1, layer_name='fc7'):
             image_data = transformer.preprocess('data', image)
             net.blobs['data'].data[index] = image_data
         net.forward()
-        features[idx:idx + bsize] = net.blobs[layer_name].data.reshape(-1, net.blobs[layer_name].data.size / bsize).copy()
+        features[idx:idx + bsize] = net.blobs[
+            layer_name].data.reshape(-1, net.blobs[layer_name].data.size / bsize).copy()
         idx += bsize
     print "It took %f" % (time.clock() - start)
     return features
@@ -175,7 +180,7 @@ class FeatureCreator:
         self.verbose = verbose
         self.data_prefix = ''
 
-    def prepare_features(self, image_files):
+    def get_mode(self):
         old_batch_size, channels, height, width = self.transformer.inputs[
             'data']
         if channels == 3:
@@ -184,6 +189,11 @@ class FeatureCreator:
             mode = 'L'
         else:
             raise ValueError('Invalid number for channels: %s' % channels)
+        return mode
+
+    def prepare_features(self, image_files):
+        old_batch_size, channels, height, width = self.transformer.inputs['data']
+        mode = self.get_mode()
         print "Loading images"
         images = []
         for image_file in image_files:
@@ -212,6 +222,28 @@ class FeatureCreator:
             self.features[short_name] = feats[i].reshape(feats[i].size)
             i += 1
         self.net = None  # free video memory
+
+    def get_grid_features(self, image_path, mode):
+        data = convert_image(PIL.Image.open(image_path), mode)
+        (h, w) = data.shape[0:2]
+        maxSize = max((w, h))
+        pSizes = (np.array([0.16, 0.32, 0.64]) * maxSize).astype('uint16')
+        stepSizes = pSizes / 2  # step size is half of feature size
+        nLevels = pSizes.size
+        patches = []
+        metaInfo = []
+        for l in range(nLevels):
+            pSize = pSizes[l]
+            for x in range(0, w - pSize, stepSizes[l]):
+                for y in range(0, h - pSize, stepSizes[l]):
+                    patches.append(data[y:y + pSize, y:y + pSize])
+                    # x, y, patch size, depth of center area
+                    metaInfo.append([x, y, pSize, patches[-1][pSize / 2 -
+                                                              4:pSize / 2 + 4, pSize / 2 - 4:pSize / 2 + 4].mean()])
+            print "%d patches, %dx%d - %d" % (len(patches), w, h, pSize)
+        features = forward_pass(patches, self.net, self.transformer,
+                                batch_size=self.batch_size, layer_name=self.layer_name)
+        return (features, np.vstack(metaInfo))
 
     def get_features(self, image_path):
         feats = self.features.get(image_path, None)

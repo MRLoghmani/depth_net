@@ -3,6 +3,10 @@ import pickle
 from argparse import ArgumentParser
 from os.path import join
 import feature_handler_v2
+import h5py
+import ConfigParser
+import os
+
 
 def get_arguments():
     parser = ArgumentParser(
@@ -21,25 +25,48 @@ def get_arguments():
     parser.add_argument("--scale", type=float, default=None)
     parser.add_argument("--gpu_id", type=int, default=0)
     parser.add_argument("--opt_ext", default="", help="Extension to add to the filenames")
+    parser.add_argument("--patchMode", action="store_true")
     args = parser.parse_args()
     return args
+
+
+def handle_patches(all_files, f_extractor, directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    mode = f_extractor.get_mode()
+    for file in all_files:
+        (feats, meta) = f_extractor.get_grid_features(file, mode)
+        f = h5py.File(os.path.join(directory, os.path.basename(file) + ".hdf5"), "w")
+        data = f.create_dataset("feats", feats.shape, compression="gzip", compression_opts=9, dtype="float32")
+        pos = f.create_dataset("position", (meta.shape[0], 2), compression="gzip", compression_opts=9, dtype="uint16")
+        fSize = f.create_dataset("fSize", (meta.shape[0], ), compression="gzip", compression_opts=9, dtype="uint16")
+        depth = f.create_dataset("depth", (meta.shape[0], ), compression="gzip", compression_opts=9, dtype="float32")
+        data[:] = feats
+        #import ipdb; ipdb.set_trace()
+        pos[:] = meta[:, 0:2]
+        fSize[:] = meta[:, 2]
+        depth[:] = meta[:, 3]
+        f.close()
 
 
 def make_features(args):
     print "Starting feature generation procedure..."
     f_extractor = feature_handler_v2.FeatureCreator(
         args.net_proto, args.net_model, args.mean_pixel, args.mean_file, not args.use_cpu,
-         layer_name=args.layer_name, gpu_id=args.gpu_id)
+        layer_name=args.layer_name, gpu_id=args.gpu_id)
     f_extractor.batch_size = args.batch_size
     f_extractor.center_data = args.center_data
     f_extractor.set_data_scale(args.scale)
     f_extractor.data_prefix = args.data_dir
     all_lines = open(args.filelist, 'rt').readlines()
     all_lines = [join(args.data_dir, line.strip() + args.opt_ext) for line in all_lines]
-    # preload all features so that they are handled in batches
-    f_extractor.prepare_features(all_lines)
-    with open(args.output_filename, 'wb') as f:
-        pickle.dump(f_extractor.features, f, pickle.HIGHEST_PROTOCOL)
+    if args.patchMode:
+        handle_patches(all_lines, f_extractor, args.output_filename)
+    else:
+        # preload all features so that they are handled in batches
+        f_extractor.prepare_features(all_lines)
+        with open(args.output_filename, 'wb') as f:
+            pickle.dump(f_extractor.features, f, pickle.HIGHEST_PROTOCOL)
 
 if __name__ == '__main__':
     args = get_arguments()

@@ -17,11 +17,12 @@ if [[ $CAFFE_MODEL =~ $job_re ]]; then JOB_ID=${BASH_REMATCH[1]}; fi  # get job 
 
 NORM_NAME=${FEAT_FOLDER}vandal_${JOB_ID}_normalized.pkl
 ORIG_NAME=${FEAT_FOLDER}vandal_${JOB_ID}_original.pkl
+source activate digits_bvlc
 
 echo Extracting Washington normalized to $NORM_NAME
-python -u feature_extractor.py ~/rgbd_washington/rgbd-normalized_gray/ Washington/all_depth_clean.txt $DEPLOY $CAFFE_MODEL $NORM_NAME --center_data --gpu_id 0 --batch-size $BSIZE --layer_name ${layer}
+python -u feature_extractor.py ../Washington/rgbd-normalized_gray/ Washington/all_depth_clean.txt $DEPLOY $CAFFE_MODEL $NORM_NAME --center_data --gpu_id 0 --batch-size $BSIZE --layer_name ${layer}
 echo Extracting Washington original to $ORIG_NAME
-python -u feature_extractor.py ~/rgbd_washington/rgbd-original/ Washington/all_depth_clean.txt $DEPLOY $CAFFE_MODEL $ORIG_NAME --center_data --gpu_id 0 --batch-size $BSIZE --layer_name ${layer}
+python -u feature_extractor.py ../Washington/rgbd-original/ Washington/all_depth_clean.txt $DEPLOY $CAFFE_MODEL $ORIG_NAME --center_data --gpu_id 0 --batch-size $BSIZE --layer_name ${layer}
 
 #source activate svm
 source deactivate
