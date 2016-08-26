@@ -35,6 +35,7 @@ def handle_patches(all_files, f_extractor, directory):
         os.makedirs(directory)
     mode = f_extractor.get_mode()
     for file in all_files:
+        #import ipdb; ipdb.set_trace()
         (feats, meta) = f_extractor.get_grid_features(file, mode)
         f = h5py.File(os.path.join(directory, os.path.basename(file) + ".hdf5"), "w")
         data = f.create_dataset("feats", feats.shape, compression="gzip", compression_opts=9, dtype="float32")
@@ -42,7 +43,6 @@ def handle_patches(all_files, f_extractor, directory):
         fSize = f.create_dataset("fSize", (meta.shape[0], ), compression="gzip", compression_opts=9, dtype="uint16")
         depth = f.create_dataset("depth", (meta.shape[0], ), compression="gzip", compression_opts=9, dtype="float32")
         data[:] = feats
-        #import ipdb; ipdb.set_trace()
         pos[:] = meta[:, 0:2]
         fSize[:] = meta[:, 2]
         depth[:] = meta[:, 3]

@@ -2,6 +2,7 @@
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import classification_report
+from sklearn.preprocessing import normalize
 import re
 import pickle
 from sklearn.metrics import confusion_matrix
@@ -18,12 +19,14 @@ from scipy import io
 
 
 class RunParams:
-    def __init__(self, save_kernel=False, tuneParams=False, pca_dims=None, out_name="Kernel"):
-        self.pca_dims = pca_dims
-        self.save_kernel = save_kernel
-        self.tuneParams = tuneParams
+
+    def __init__(self, args):
+        self.pca_dims = args.PCA_dims
+        self.kernel_name = args.kernel_name
+        self.save_kernel = self.kernel_name is not None
+        self.tuneParams = args.tuneParams
         self.C = 1
-        self.out_name = out_name
+        self.normalize = args.normalize
 
 type_regex = re.compile(ur'_([depthcrop]+)\.png')
 
@@ -46,7 +49,8 @@ def get_arguments():
     parser.add_argument("--classes", type=int, default=51)
     parser.add_argument("--PCA_dims", type=int, default=None)
     parser.add_argument("--tuneParams", action="store_true")
-    parser.add_argument("--kernel_name", default="kernel")
+    parser.add_argument("--kernel_name", default=None)
+    parser.add_argument("--normalize", action="store_true")
     args = parser.parse_args()
     return args
 
@@ -71,8 +75,10 @@ def is_alive(job):
 def prepare_jobs(split_dir, features, n_splits, jobs, classes, runParams):
     if runParams.tuneParams:
         print "Running parameter optimization"
-        (X, y) = load_split(join(split_dir, args.split_prefix + 'train_split_0.txt'), features, classes)
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
+        (X, y) = load_split(join(split_dir, args.split_prefix +
+                                 'train_split_0.txt'), features, classes)
+        X_train, X_test, y_train, y_test = train_test_split(
+            X, y, test_size=0.2, random_state=0)
         tuned_parameters = [{'C': [0.0001, 0.001, 0.1, 1, 10, 100, 1000]}]
         scores = ['precision', 'recall']
         for score in scores:
@@ -150,7 +156,16 @@ def run_split(split_dir, features, n_splits, splits_acc, x, classes, runParams):
     (test_features, test_labels) = load_split(join(split_dir,
                                                    args.split_prefix + 'test_split_' + str(x) + '.txt'), features, classes)
     print "Loaded %s train and %s test - starting svm"
-    #save_kernel_matrix(train_features, test_features, train_labels, test_labels, runParams.out_name)
+    if runParams.normalize:
+        start = time.time()
+        print "Will normalize data"
+        train_features = normalize(train_features, copy=False)
+        test_features = normalize(test_features, copy=False)
+        print "It took %f seconds" % (time.time() - start)
+    if runParams.save_kernel:
+        print "Saving kernel"
+        save_kernel_matrix(train_features, test_features, train_labels,
+                           test_labels, runParams.kernel_name + "_" + str(x))
     splits_acc[x] = do_svm(LoadedData(
         train_features, train_labels, test_features, test_labels), x, runParams)
 
@@ -254,7 +269,7 @@ if __name__ == '__main__':
     if features is None:
         print "Features not found or corruped - exiting"
         quit()
-    params = RunParams(tuneParams=args.tuneParams, out_name=args.kernel_name)
+    params = RunParams(args)
     prepare_jobs(args.split_dir, features, args.splits,
                  args.jobs, args.classes, params)
     elapsed_time = time.time() - start_time

@@ -226,20 +226,22 @@ class FeatureCreator:
     def get_grid_features(self, image_path, mode):
         data = convert_image(PIL.Image.open(image_path), mode)
         (h, w) = data.shape[0:2]
+        cS = 4  # center size for depth mean
         maxSize = max((w, h))
         pSizes = (np.array([0.16, 0.32, 0.64]) * maxSize).astype('uint16')
+        # fixed step size for all might be better? Must check
         stepSizes = pSizes / 2  # step size is half of feature size
         nLevels = pSizes.size
-        patches = []
-        metaInfo = []
+        patches = [data]  # start with the whole image
+        metaInfo = [[0, 0, -1, data[h/2-cS:h/2+cS, w/2-cS:w/2+cS].mean()]]
         for l in range(nLevels):
             pSize = pSizes[l]
             for x in range(0, w - pSize, stepSizes[l]):
                 for y in range(0, h - pSize, stepSizes[l]):
-                    patches.append(data[y:y + pSize, y:y + pSize])
-                    # x, y, patch size, depth of center area
-                    metaInfo.append([x, y, pSize, patches[-1][pSize / 2 -
-                                                              4:pSize / 2 + 4, pSize / 2 - 4:pSize / 2 + 4].mean()])
+                    crop = data[y:y + pSize, y:y + pSize]
+                    patches.append(crop)
+                    # x, y, patch level, depth of center area
+                    metaInfo.append([x, y, l, crop[pSize/2-cS:pSize/2+cS, pSize/2-cS:pSize/2+cS].mean()])
             print "%d patches, %dx%d - %d" % (len(patches), w, h, pSize)
         features = forward_pass(patches, self.net, self.transformer,
                                 batch_size=self.batch_size, layer_name=self.layer_name)
