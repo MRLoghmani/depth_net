@@ -27,7 +27,7 @@ class RunParams:
         self.tuneParams = args.tuneParams
         self.C = 1
         self.normalize = args.normalize
-
+        self.saveMargin  = args.saveMargin
 type_regex = re.compile(ur'_([depthcrop]+)\.png')
 
 LoadedData = namedtuple(
@@ -51,6 +51,7 @@ def get_arguments():
     parser.add_argument("--tuneParams", action="store_true")
     parser.add_argument("--kernel_name", default=None)
     parser.add_argument("--normalize", action="store_true")
+    parser.add_argument("--saveMargin", default=None)
     args = parser.parse_args()
     return args
 
@@ -204,6 +205,14 @@ def do_svm(loaded_data, split_n, runParams):
     clf = svm.LinearSVC(dual=False, C=runParams.C)  # C=0.00001 good for JHUIT
     clf.fit(train_data, loaded_data.train_labels)
     res = clf.predict(test_data)
+    if runParams.saveMargin:
+        Margins = clf.decision_function(test_data)
+        filemargins = open('margin'+runParams.saveMargin+str(split_n)+'.txt', 'w')
+        #ftest_labels = open('test_labels.pkl', 'w') #enable only if loaded_data.test_labels change        
+        #pickle.dump(loaded_data.test_labels, ftest_labels)
+        pickle.dump(Margins,filemargins)
+        filemargins.close()
+        print "fileMargins "+str(split_n)+ " written!"
     confusion = confusion_matrix(loaded_data.test_labels, res)
     if conf_path is not None:
         np.savetxt(conf_path + '_' + str(split_n) + '.csv', confusion)
