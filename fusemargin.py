@@ -56,35 +56,32 @@ if __name__ == '__main__':
     if args.nMargin == 2:
         margin1=pickle.load(open(args.m1))
         margin2=pickle.load(open(args.m2))
-        mean_margin=0.5* (margin1+margin2)
-	SamplesNum=len(mean_margin)
-        ClassNum=len(mean_margin[0])
-	print SamplesNum
-	print ClassNum
-#        import code 
-#        code.interact(local=locals())
-        res = np.zeros(SamplesNum)
-        for k in range(SamplesNum):
+        mean_margin=(margin1+margin2)/2
+    if args.nMargin == 3:
+        margin1=pickle.load(open(args.m1))
+        margin2=pickle.load(open(args.m2))
+        margin3=pickle.load(open(args.m3))
+        mean_margin= (margin1+margin2+margin3)/3
+    if args.nMargin == 4:
+        margin1=pickle.load(open(args.m1))
+        margin2=pickle.load(open(args.m2))
+        margin3=pickle.load(open(args.m3))
+        margin4=pickle.load(open(args.m4))
+        mean_margin= (margin1+margin2+margin3+margin4)/4
+        
+    SamplesNum=len(mean_margin)
+    ClassNum=len(mean_margin[0])
+    res = np.zeros(SamplesNum)
+    for k in range(SamplesNum):
+        res[k]=np.argmax(mean_margin[k])
+    #res[k]=[(np.argmax(mean_margin[k])) for k in range(SamplesNum)]
+    
 #            print k
 #            res[k] = [(i if mean_margin[k][p] > 0 else j) for p,(i,j) in enumerate((i,j) 
 #                                                    for i in range(ClassNum)
 #                                                    for j in range(i+1,ClassNum))]
-            res[k]=np.argmax(mean_margin[k])
-
-#            p=0
-#            for i in range(ClassNum):                
-#                for j in range(i+1,ClassNum):
-#		    print "i=" + str(i)
-#		    print "j=" + str(j)
-# 		    print "p=" + str(p)
-
-#                    if mean_margin[k][j] > 0:
-#                        res[k] = i
-#                    else:
-#                        res[k] = j
-#                    p=p+1
-        confusion = confusion_matrix(test_labels, res)
-        correct = (res == test_labels).sum()
-        print "Margins fusion  " + str(args.m1) + " and " + str(args.m2) +" got " + str((100.0 * correct) / test_labels.size) \
+    confusion = confusion_matrix(test_labels, res)
+    correct = (res == test_labels).sum()
+    print "Margins fusion  " + str(args.m1) + " and " + str(args.m2) +" got " + str((100.0 * correct) / test_labels.size) \
             + "% correct"
 
