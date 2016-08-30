@@ -16,19 +16,6 @@ import mkl
 from sklearn.decomposition import PCA
 from scipy import io
 
-class RunParams:
-
-    def __init__(self, args):
-        self.pca_dims = args.PCA_dims
-        self.kernel_name = args.kernel_name
-        self.save_kernel = self.kernel_name is not None
-        self.tuneParams = args.tuneParams
-        self.C = 1
-        self.normalize = args.normalize
-        self.saveMargin  = args.saveMargin
-
-LoadedData = namedtuple(
-    "LoadedData", "train_patches train_labels test_patches test_labels")
 
 def get_arguments():
     parser = ArgumentParser(
@@ -45,6 +32,7 @@ def get_arguments():
     parser.add_argument("--m3", default=None)
     parser.add_argument("--m4", default=None)
     parser.add_argument("--test_labels",default='test_labels')
+    parser.add_argument("--means",type=str,default=None)
     args = parser.parse_args()
     return args
 
@@ -55,6 +43,8 @@ if __name__ == '__main__':
     print "\n"
     print args
     splits_acc=0.0
+    if args.means is not None:
+        means_list_split = [str(item) for item in args.means.split(';')]    
     for t in range(args.nSplit):
 #        import code
 #        code.interact(local=locals())
@@ -64,7 +54,13 @@ if __name__ == '__main__':
             file2=args.m2+'_split'+str(t)
             margin1=pickle.load(open(file1))
             margin2=pickle.load(open(file2))
-            mean_margin=(margin1+margin2)/2
+            if args.means is not None:
+		means_list = [float(item) for item in means_list_split[t].split(' ')]
+                weight1 = means_list[0]/sum(means_list)
+                weight2 = means_list[1]/sum(means_list)
+                mean_margin=(weight1*margin1)+(weight2*margin2)                
+            else:
+                mean_margin=(margin1+margin2)/2
         if args.nMargin == 3:
             file1=args.m1+'_split'+str(t)
             file2=args.m2+'_split'+str(t)
@@ -72,7 +68,14 @@ if __name__ == '__main__':
             margin1=pickle.load(open(file1))
             margin2=pickle.load(open(file2))
             margin3=pickle.load(open(file3))
-            mean_margin= (margin1+margin2+margin3)/3
+            if args.means is not None:
+		means_list = [float(item) for item in means_list_split[t].split(' ')]
+                weight1 = means_list[0]/sum(means_list)
+                weight2 = means_list[1]/sum(means_list)
+                weight3 = means_list[2]/sum(means_list)
+                mean_margin=(weight1*margin1)+(weight2*margin2)+(weight3*margin3)
+            else:
+                mean_margin=(margin1+margin2+margin3)/3
         if args.nMargin == 4:
             file1=args.m1+'_split'+str(t)
             file2=args.m2+'_split'+str(t)
@@ -82,7 +85,15 @@ if __name__ == '__main__':
             margin2=pickle.load(open(file2))
             margin3=pickle.load(open(file3))
             margin4=pickle.load(open(file4))
-            mean_margin= (margin1+margin2+margin3+margin4)/4
+            if args.means is not None:
+		means_list = [float(item) for item in means_list_split[t].split(' ')]
+                weight1 = means_list[0]/sum(means_list)
+                weight2 = means_list[1]/sum(means_list)
+                weight3 = means_list[2]/sum(means_list)
+		weight4 = means_list[3]/sum(means_list)
+                mean_margin=(weight1*margin1)+(weight2*margin2)+(weight3*margin3)+(weight4*margin4)
+            else:
+                mean_margin=(margin1+margin2+margin3+margin4)/4
         SamplesNum=len(mean_margin)
         ClassNum=len(mean_margin[0])
         res = np.zeros(SamplesNum)
