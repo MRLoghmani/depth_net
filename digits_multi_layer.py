@@ -6,14 +6,13 @@ import random
 from random import randint
 from multiprocessing import Process
 
-class Multiplicative(caffe.Layer):
+class DoItAll(caffe.Layer):
     def setup(self, bottom, top):
         assert len(bottom) == 1,            'requires a single layer.bottom'
         assert bottom[0].data.ndim >= 3,    'requires image data'
         assert len(top) == 1,               'requires a single layer.top'
 
     def reshape(self, bottom, top):
-
         # Copy shape from bottom
         top[0].reshape(*bottom[0].data.shape)
 
@@ -22,12 +21,16 @@ class Multiplicative(caffe.Layer):
         # Then zero-out one fourth of the image
         height = 227
         width = 227
+        obj_mean = bottom[0].data[bottom[0].data<255.0].mean()
         h_offset = random.randrange(int(height / 2 + height / 4))
         w_offset = random.randrange(int(width / 2 + width / 4))
         bottom[0].data[...,
                     h_offset:(h_offset + height / 4),
                     w_offset:(w_offset + width / 4),
                     ] = fill
+        scale = random.uniform(0.5,2.0)
+        offset = random.uniform(-20,20)
+        shift = -128.0#-128.0 ##this is to center the images; we chose 128 as the image is from 0 to 255 (but usually its real mean is more than 128)
         def subf(bottom,top,start,finish):
             for i in range(start,finish): #just to remember:it will stop looping with last variable finish-1 !
                 Bx = random.uniform(0.0,0.5) # amount of shearing in x-axis
@@ -38,18 +41,10 @@ class Multiplicative(caffe.Layer):
                     By = By * (-1)
                 shear_array=np.array([[1,Bx],[By,1]])
                 top[0].data[i,0,:] = ndimage.affine_transform( bottom[0].data[i,0,:],matrix=[[1,Bx],[By,1]],order=0,cval=255.0)
-		scale = random.uniform(0.5,2.0)
-                offset = random.uniform(-20,20)
-                shift = -128.0#-128.0 ##this is to center the images; we chose 128 as the image is from 0 to 255 (but usually its real mean is more than 128)
-                shiftscaled = shift * scale## because I apply first the scale to the image, then I have to add shift*scale instead of simply shift
-                shiftscaledOffset= shiftscaled + offset  ##final value including the offset
-		top[0].data[i,0,:] *=scale
-		top[0].data[i,0,:] += shiftscaledOffset
 
 	batch_size=bottom[0].data.shape[0]
 	divided_batch=batch_size // 4 #integer division, from the future!
-	if divided_batch > 1:
- 
+	if False: #divided_batch > 1:
 	    p1 = Process(target=subf, args=(bottom,top,0,divided_batch,))
 	    p2 = Process(target=subf, args=(bottom,top,divided_batch,divided_batch*2,))
             p3 = Process(target=subf, args=(bottom,top,divided_batch*2,divided_batch*3,))
@@ -65,6 +60,10 @@ class Multiplicative(caffe.Layer):
 	    p4.join()
 	else:#It cannot be parallelizable, or it is just batch size = 1 (for example classify one of DIGITS)
 	    subf(bottom,top,0,batch_size)      
+        bg = (top[0].data==255.0)
+        top[0].data[bg] = np.random.uniform(obj_mean, 255.0)  # between the object mean and 255
+        NOISE=5
+        top[0].data[...] = (top[0].data + shift) * scale + offset + np.random.uniform(-NOISE, NOISE, top[0].data.shape) # also adds noise
 
     def backward(self, top, propagate_down, bottom):
         pass
