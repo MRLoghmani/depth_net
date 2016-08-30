@@ -209,12 +209,11 @@ def do_svm(loaded_data, split_n, runParams):
     res = clf.predict(test_data)
     if runParams.saveMargin:
         Margins = clf.decision_function(test_data)
-        filemargins = open('margin'+runParams.saveMargin+str(split_n)+'.txt', 'w')
-        #ftest_labels = open('test_labels.pkl', 'w') #enable only if loaded_data.test_labels change        
-        #pickle.dump(loaded_data.test_labels, ftest_labels)
+        filemargins = open(runParams.saveMargin+'_split'+str(split_n), 'w')
+        ftest_labels = open('test_labels'+'_split'+str(split_n), 'w') #enable only if loaded_data.test_labels change
+        pickle.dump(loaded_data.test_labels, ftest_labels)
         pickle.dump(Margins,filemargins)
         filemargins.close()
-        print "fileMargins "+str(split_n)+ " written!"
     confusion = confusion_matrix(loaded_data.test_labels, res)
     if conf_path is not None:
         np.savetxt(conf_path + '_' + str(split_n) + '.csv', confusion)
