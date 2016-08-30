@@ -31,7 +31,7 @@ python feature_extractor.py ../JHUIT/JHUIT/ JHUIT/all_depth.txt $DEPLOY $CAFFE_M
 source deactivate
 echo "Running SVM on $NORM_NAME"
 SECONDS=0
-python -u svm_baseline_parallel.py JHUIT/ $NORM_NAME --splits 1 --split_prefix jhuit_depth_ --classes 49 --mkl_threads 2 --kernel_name jhuit_norm_kernel
+python -u svm_baseline_parallel.py JHUIT/ $NORM_NAME --splits 1 --split_prefix jhuit_depth_ --classes 49 --mkl_threads 2 # --kernel_name jhuit_norm_kernel
 echo "Took $SECONDS seconds"
 
 #SECONDS=0
@@ -41,5 +41,5 @@ echo "Took $SECONDS seconds"
 
 SECONDS=0
 echo "Running SVM on $ORIG_NAME"
-python -u svm_baseline_parallel.py JHUIT/ $ORIG_NAME --splits 1 --split_prefix jhuit_depth_ --classes 49  --mkl_threads 2 --kernel_name jhuit_orig_kernel
+python -u svm_baseline_parallel.py JHUIT/ $ORIG_NAME --splits 1 --split_prefix jhuit_depth_ --classes 49  --mkl_threads 2 # --kernel_name jhuit_orig_kernel
 echo "Took $SECONDS seconds"

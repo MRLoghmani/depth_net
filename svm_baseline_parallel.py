@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import h5py
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import classification_report
@@ -10,7 +11,7 @@ from sklearn import svm
 import numpy as np
 from argparse import ArgumentParser
 from collections import namedtuple
-from os.path import join
+from os.path import join, splitext
 import time
 from multiprocessing import Process, Array
 import mkl
@@ -25,7 +26,7 @@ class RunParams:
         self.kernel_name = args.kernel_name
         self.save_kernel = self.kernel_name is not None
         self.tuneParams = args.tuneParams
-        self.C = 1
+        self.C = args.C
         self.normalize = args.normalize
 
 type_regex = re.compile(ur'_([depthcrop]+)\.png')
@@ -51,6 +52,7 @@ def get_arguments():
     parser.add_argument("--tuneParams", action="store_true")
     parser.add_argument("--kernel_name", default=None)
     parser.add_argument("--normalize", action="store_true")
+    parser.add_argument("--C", type=float, default=1)
     args = parser.parse_args()
     return args
 
@@ -141,7 +143,7 @@ def load_split(split_path, feat_dict, classes):
     for line in ft_lines:
         [path, classLabel] = line.split()
         nClass = int(classLabel)
-        features[nClass][ccounter[nClass]] = feat_dict[path]
+        features[nClass][ccounter[nClass]] = feat_dict[path][:f_size]
         ccounter[nClass] += 1
     labels = np.hstack([np.ones(data.shape[0]) * c for c,
                         data in enumerate(features)]).ravel()
@@ -214,8 +216,28 @@ def do_svm(loaded_data, split_n, runParams):
     return (100.0 * correct) / loaded_data.test_labels.size
 
 
+def get_readable_list(name, f):
+    readable = []
+    for x in range(name.size):
+        obj = f[name[0][x]]
+        readable.append(''.join(chr(i) for i in obj[:]))
+    return readable
+
+
+def get_hdf5_feats(path):
+    print "Loading hdf5\mat file"
+    f = h5py.File(path)
+    # temp code
+    feats = f['X'][:]
+    names = get_readable_list(f['filelist'][:], f)
+    all_lines = [join(args.data_dir, line.strip() + args.opt_ext) for line in all_lines]
+
+
 def get_features(args):
     print "Loading precomputed features"
+    extension = splitext(args.feature_dict[0])[1]
+    if extension is '.mat':
+        return get_hdf5_feats(args.feature_dict[0])
     feats = args.feature_dict
     if len(feats) > 1:
         return fuse_features(args)
@@ -259,6 +281,7 @@ def fuse_features(args):
     return feat_dict
 
 if __name__ == '__main__':
+#    import ipdb; ipdb.set_trace()
     start_time = time.time()
     args = get_arguments()
     mkl.set_num_threads(args.mkl_threads)

@@ -28,10 +28,10 @@ python -u feature_extractor.py ../Washington/rgbd-original/ Washington/all_depth
 source deactivate
 echo "Running SVM on $NORM_NAME"
 SECONDS=0
-python -u svm_baseline_parallel.py Washington/splits/ $NORM_NAME --splits $N_SPLITS --jobs 4 --normalize # --kernel_name washington_normalized_kernel_${JOB_ID}
+python -u svm_baseline_parallel.py Washington/splits/ $NORM_NAME --splits $N_SPLITS --jobs 4 #--normalize # --kernel_name washington_normalized_kernel_${JOB_ID}
 echo "Took $SECONDS seconds"
 
 SECONDS=0
 echo "Running SVM on $ORIG_NAME"
-python -u svm_baseline_parallel.py Washington/splits/ $ORIG_NAME --splits $N_SPLITS --jobs 4  --normalize #--kernel_name washington_original_kernel_${JOB_ID}
+python -u svm_baseline_parallel.py Washington/splits/ $ORIG_NAME --splits $N_SPLITS --jobs 4  #--normalize #--kernel_name washington_original_kernel_${JOB_ID}
 echo "Took $SECONDS seconds"

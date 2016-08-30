@@ -225,23 +225,26 @@ class FeatureCreator:
 
     def get_grid_features(self, image_path, mode):
         data = convert_image(PIL.Image.open(image_path), mode)
-        (h, w) = data.shape[0:2]
+        (h, w) = data.shape[0:2]  # the third dim might be present for RGB
         cS = 4  # center size for depth mean
         maxSize = max((w, h))
         pSizes = (np.array([0.16, 0.32, 0.64]) * maxSize).astype('uint16')
-        # fixed step size for all might be better? Must check
-        stepSizes = pSizes / 2  # step size is half of feature size
         nLevels = pSizes.size
+        # better fixed step size or variable step size?
+        stepSizes = np.ones(nLevels, dtype='int8') * pSizes[0]/2  # pSizes / 2 step size is half of feature size
         patches = [data]  # start with the whole image
-        metaInfo = [[0, 0, -1, data[h/2-cS:h/2+cS, w/2-cS:w/2+cS].mean()]]
+        metaInfo = [[0.5, 0.5, 0, data[h/2-cS:h/2+cS, w/2-cS:w/2+cS].mean()]]
         for l in range(nLevels):
             pSize = pSizes[l]
+            if pSize <= 4 or stepSizes[l]<1:
+                continue
             for x in range(0, w - pSize, stepSizes[l]):
                 for y in range(0, h - pSize, stepSizes[l]):
-                    crop = data[y:y + pSize, y:y + pSize]
+                    crop = data[y:y + pSize, x:x + pSize]
                     patches.append(crop)
                     # x, y, patch level, depth of center area
-                    metaInfo.append([x, y, l, crop[pSize/2-cS:pSize/2+cS, pSize/2-cS:pSize/2+cS].mean()])
+                    metaInfo.append([(x+pSize/2.0)/w, (y+pSize/2.0)/h,
+                                     nLevels - l, crop[pSize/2-cS:pSize/2+cS, pSize/2-cS:pSize/2+cS].mean()])
             print "%d patches, %dx%d - %d" % (len(patches), w, h, pSize)
         features = forward_pass(patches, self.net, self.transformer,
                                 batch_size=self.batch_size, layer_name=self.layer_name)

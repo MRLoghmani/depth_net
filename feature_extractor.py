@@ -30,21 +30,25 @@ def get_arguments():
     return args
 
 
-def handle_patches(all_files, f_extractor, directory):
+def handle_patches(all_files, f_extractor, directory, rootPath):
+    import ipdb; ipdb.set_trace()
     if not os.path.exists(directory):
         os.makedirs(directory)
     mode = f_extractor.get_mode()
+    c = 0
     for file in all_files:
-        #import ipdb; ipdb.set_trace()
-        (feats, meta) = f_extractor.get_grid_features(file, mode)
-        f = h5py.File(os.path.join(directory, os.path.basename(file) + ".hdf5"), "w")
+        # import ipdb; ipdb.set_trace()
+        (feats, meta) = f_extractor.get_grid_features(join(rootPath, file.strip()), mode)
+        f = h5py.File(os.path.join(directory, os.path.basename(file.strip()) + "_" + str(c) + ".hdf5"), "w")
+        c += 1
         data = f.create_dataset("feats", feats.shape, compression="gzip", compression_opts=9, dtype="float32")
         pos = f.create_dataset("position", (meta.shape[0], 2), compression="gzip", compression_opts=9, dtype="uint16")
-        fSize = f.create_dataset("fSize", (meta.shape[0], ), compression="gzip", compression_opts=9, dtype="uint16")
+        level = f.create_dataset("level", (meta.shape[0], ), compression="gzip", compression_opts=9, dtype="uint16")
         depth = f.create_dataset("depth", (meta.shape[0], ), compression="gzip", compression_opts=9, dtype="float32")
+        f.attrs['relative_path'] = file.strip()
         data[:] = feats
         pos[:] = meta[:, 0:2]
-        fSize[:] = meta[:, 2]
+        level[:] = meta[:, 2]
         depth[:] = meta[:, 3]
         f.close()
 
@@ -59,10 +63,10 @@ def make_features(args):
     f_extractor.set_data_scale(args.scale)
     f_extractor.data_prefix = args.data_dir
     all_lines = open(args.filelist, 'rt').readlines()
-    all_lines = [join(args.data_dir, line.strip() + args.opt_ext) for line in all_lines]
     if args.patchMode:
-        handle_patches(all_lines, f_extractor, args.output_filename)
+        handle_patches(all_lines, f_extractor, args.output_filename, args.data_dir)
     else:
+        all_lines = [join(args.data_dir, line.strip() + args.opt_ext) for line in all_lines]
         # preload all features so that they are handled in batches
         f_extractor.prepare_features(all_lines)
         with open(args.output_filename, 'wb') as f:
