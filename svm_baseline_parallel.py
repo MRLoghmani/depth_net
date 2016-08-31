@@ -17,7 +17,7 @@ from multiprocessing import Process, Array
 import mkl
 from sklearn.decomposition import PCA
 from scipy import io
-from sklearn.feature_selection import SelectKBest, f_regression
+from sklearn.feature_selection import SelectKBest, f_regression, VarianceThreshold
 from sklearn.pipeline import make_pipeline
 
 class RunParams:
@@ -219,7 +219,10 @@ def do_svm(loaded_data, split_n, runParams):
         res = clf.predict(test_data)
 
     if runParams.saveMargin:
-        Margins = clf.decision_function(test_data)
+	if runParams.SelectKBest:
+	    Margins = anova_svm.decision_function(test_data)
+        else:
+            Margins = clf.decision_function(test_data)
         filemargins = open(runParams.saveMargin+'_split'+str(split_n), 'w')
         ftest_labels = open('test_labels'+'_split'+str(split_n), 'w') #enable only if loaded_data.test_labels change
         pickle.dump(loaded_data.test_labels, ftest_labels)
