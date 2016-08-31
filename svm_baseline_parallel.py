@@ -241,7 +241,7 @@ def do_svm(loaded_data, split_n, runParams):
 def get_readable_list(name, f):
     readable = []
     for x in range(name.size):
-        obj = f[name[0][x]]
+        obj = f[f[name[0][x]][0][0]]
         readable.append(''.join(chr(i) for i in obj[:]))
     return readable
 
