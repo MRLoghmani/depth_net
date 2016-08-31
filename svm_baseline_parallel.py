@@ -17,10 +17,11 @@ from multiprocessing import Process, Array
 import mkl
 from sklearn.decomposition import PCA
 from scipy import io
+from sklearn.feature_selection import SelectKBest, f_regression, VarianceThreshold
+from sklearn.pipeline import make_pipeline
 
 
 class RunParams:
-
     def __init__(self, args):
         self.pca_dims = args.PCA_dims
         self.kernel_name = args.kernel_name
@@ -29,6 +30,7 @@ class RunParams:
         self.C = args.C
         self.normalize = args.normalize
         self.saveMargin = args.saveMargin
+        self.SelectKBest = args.SelectKBest
 type_regex = re.compile(ur'_([depthcrop]+)\.png')
 
 LoadedData = namedtuple(
@@ -49,12 +51,12 @@ def get_arguments():
     parser.add_argument("--mkl_threads", type=int, default=2)
     parser.add_argument("--classes", type=int, default=51)
     parser.add_argument("--PCA_dims", type=int, default=None)
+    parser.add_argument("--SelectKBest", type=int, default=None)
     parser.add_argument("--tuneParams", action="store_true")
     parser.add_argument("--kernel_name", default=None)
     parser.add_argument("--normalize", action="store_true")
     parser.add_argument("--C", type=float, default=1)
     parser.add_argument("--saveMargin", default=None)
-    parser.add_argument("--feature_size", default=None, type=int)
     args = parser.parse_args()
     return args
 
@@ -205,11 +207,22 @@ def do_svm(loaded_data, split_n, runParams):
         test_data = loaded_data.test_patches
     print "Feature mean %f and std %f" % (train_data.mean(), train_data.std())
     start = time.time()
-    clf = svm.LinearSVC(dual=False, C=runParams.C)  # C=0.00001 good for JHUIT
-    clf.fit(train_data, loaded_data.train_labels)
-    res = clf.predict(test_data)
+    if runParams.SelectKBest:
+        anova_filter = SelectKBest(f_regression, k=runParams.SelectKBest)
+        clf = svm.LinearSVC(dual=False, C=runParams.C)
+        anova_svm = make_pipeline(VarianceThreshold(), anova_filter, clf)
+        anova_svm.fit(train_data, loaded_data.train_labels)
+        res = anova_svm.predict(test_data)
+    else:
+        clf = svm.LinearSVC(dual=False, C=runParams.C)  # C=0.00001 good for JHUIT
+        clf.fit(train_data, loaded_data.train_labels)
+        res = clf.predict(test_data)
+
     if runParams.saveMargin:
-        Margins = clf.decision_function(test_data)
+	if runParams.SelectKBest:
+	    Margins = anova_svm.decision_function(test_data)
+        else:
+            Margins = clf.decision_function(test_data)
         filemargins = open(runParams.saveMargin+'_split'+str(split_n), 'w')
         ftest_labels = open('test_labels'+'_split'+str(split_n), 'w') #enable only if loaded_data.test_labels change
         pickle.dump(loaded_data.test_labels, ftest_labels)
@@ -228,7 +241,7 @@ def do_svm(loaded_data, split_n, runParams):
 def get_readable_list(name, f):
     readable = []
     for x in range(name.size):
-        obj = f[f[name[0][x]][0][0]]
+        obj = f[name[0][x]]
         readable.append(''.join(chr(i) for i in obj[:]))
     return readable
 
@@ -240,7 +253,7 @@ def get_hdf5_feats(path, featSize=None):
     features = f['X'][:].T
     if featSize is None:
         featSize = features.shape[1]
-    names = get_readable_list(f['datasetNames'][:], f)
+    names = get_readable_list(f['datasetNames'], f)
     feats = {}
     for i in range(len(names)):
         feats[names[i]] = features[i][:featSize]
@@ -251,7 +264,7 @@ def get_features(args):
     print "Loading precomputed features"
     extension = splitext(args.feature_dict[0])[1]
     if extension == '.mat':
-        return get_hdf5_feats(args.feature_dict[0], args.feature_size)
+        return get_hdf5_feats(args.feature_dict[0])
     feats = args.feature_dict
     if len(feats) > 1:
         return fuse_features(args)
