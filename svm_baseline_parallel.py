@@ -3,7 +3,7 @@ import h5py
 from sklearn.cross_validation import train_test_split
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import classification_report
-from sklearn.preprocessing import normalize
+from sklearn.preprocessing import normalize, StandardScaler
 import re
 import pickle
 from sklearn.metrics import confusion_matrix
@@ -29,6 +29,7 @@ class RunParams:
         self.tuneParams = args.tuneParams
         self.C = args.C
         self.normalize = args.normalize
+        self.standardize = args.standardize
         self.saveMargin = args.saveMargin
         self.SelectKBest = args.SelectKBest
 type_regex = re.compile(ur'_([depthcrop]+)\.png')
@@ -55,6 +56,7 @@ def get_arguments():
     parser.add_argument("--tuneParams", action="store_true")
     parser.add_argument("--kernel_name", default=None)
     parser.add_argument("--normalize", action="store_true")
+    parser.add_argument("--standardize", action="store_true")
     parser.add_argument("--C", type=float, default=1)
     parser.add_argument("--saveMargin", default=None)
     args = parser.parse_args()
@@ -162,6 +164,10 @@ def run_split(split_dir, features, n_splits, splits_acc, x, classes, runParams):
     (test_features, test_labels) = load_split(join(split_dir,
                                                    args.split_prefix + 'test_split_' + str(x) + '.txt'), features, classes)
     print "Loaded %s train and %s test - starting svm"
+    if runParams.standardize:
+        scaler = StandardScaler(copy=False)
+        train_features = scaler.fit_transform(train_features)
+        test_features = scaler.transform(test_features)
     if runParams.normalize:
         start = time.time()
         print "Will normalize data"
