@@ -28,7 +28,7 @@ class RunParams:
         self.tuneParams = args.tuneParams
         self.C = args.C
         self.normalize = args.normalize
-        self.saveMargin  = args.saveMargin
+        self.saveMargin = args.saveMargin
 type_regex = re.compile(ur'_([depthcrop]+)\.png')
 
 LoadedData = namedtuple(
@@ -54,6 +54,7 @@ def get_arguments():
     parser.add_argument("--normalize", action="store_true")
     parser.add_argument("--C", type=float, default=1)
     parser.add_argument("--saveMargin", default=None)
+    parser.add_argument("--feature_size", default=None, type=int)
     args = parser.parse_args()
     return args
 
@@ -227,7 +228,7 @@ def do_svm(loaded_data, split_n, runParams):
 def get_readable_list(name, f):
     readable = []
     for x in range(name.size):
-        obj = f[name[0][x]]
+        obj = f[f[name[0][x]][0][0]]
         readable.append(''.join(chr(i) for i in obj[:]))
     return readable
 
@@ -239,7 +240,7 @@ def get_hdf5_feats(path, featSize=None):
     features = f['X'][:].T
     if featSize is None:
         featSize = features.shape[1]
-    names = get_readable_list(f['datasetNames'], f)
+    names = get_readable_list(f['datasetNames'][:], f)
     feats = {}
     for i in range(len(names)):
         feats[names[i]] = features[i][:featSize]
@@ -250,7 +251,7 @@ def get_features(args):
     print "Loading precomputed features"
     extension = splitext(args.feature_dict[0])[1]
     if extension == '.mat':
-        return get_hdf5_feats(args.feature_dict[0])
+        return get_hdf5_feats(args.feature_dict[0], args.feature_size)
     feats = args.feature_dict
     if len(feats) > 1:
         return fuse_features(args)

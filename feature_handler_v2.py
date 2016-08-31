@@ -96,11 +96,11 @@ def load_image(path, height, width, mode='RGB'):
     """
     image = PIL.Image.open(path)
     try:
-        image = image.resize((width, height), PIL.Image.BILINEAR)
+        im = convert_image(image, mode)
     except:
         print "Problem with image %s" % path
         return None
-    return convert_image(image, mode)
+    return scipy.misc.imresize(im, (height, width), 'bilinear')
 
 
 def convert_image(image, mode):
@@ -167,11 +167,11 @@ class FeatureCreator:
     """This class keeps computed features in memory
     and returns them when requested"""
 
-    def __init__(self, net_proto, net_weights, mean_pixel=None, mean_file=None, use_gpu=True, layer_name='fc7', verbose=False, gpu_id=0):
+    def __init__(self, net_proto, net_weights, mean_pixel=None, mean_file=None,
+                 use_gpu=True, layer_name='fc7', verbose=False, gpu_id=0):
         self.net = get_net(net_weights, net_proto, use_gpu, gpu_id)
         self.transformer = get_transformer(
             net_proto, mean_pixel=mean_pixel, mean_file=mean_file)
-        # self.features6 = {}
         self.features = {}
         self.layer_name = layer_name
         self.f_size = self.net.blobs[self.layer_name].data.shape[1]
@@ -191,6 +191,10 @@ class FeatureCreator:
             raise ValueError('Invalid number for channels: %s' % channels)
         return mode
 
+    def get_input_size(self):
+        old_batch_size, channels, height, width = self.transformer.inputs['data']
+        return (height, width)
+
     def prepare_features(self, image_files):
         old_batch_size, channels, height, width = self.transformer.inputs['data']
         mode = self.get_mode()
@@ -205,8 +209,7 @@ class FeatureCreator:
         mean = self.scale * mean / len(images)
         print "Image mean: %f" % mean
         if self.center_data:
-            self.transformer.set_mean('data', np.ones(
-                self.transformer.inputs['data'][1]) * mean)
+            self.transformer.set_mean('data', np.ones(self.transformer.inputs['data'][1]) * mean)
             print "Will center data"
         # Classify the image
         print "Extracting features"
@@ -223,7 +226,7 @@ class FeatureCreator:
             i += 1
         self.net = None  # free video memory
 
-    def get_grid_features(self, image_path, mode):
+    def get_grid_features(self, image_path, mode, desH, desW):
         data = convert_image(PIL.Image.open(image_path), mode)
         (h, w) = data.shape[0:2]  # the third dim might be present for RGB
         cS = 4  # center size for depth mean
@@ -236,7 +239,7 @@ class FeatureCreator:
         metaInfo = [[0.5, 0.5, 0, data[h/2-cS:h/2+cS, w/2-cS:w/2+cS].mean()]]
         for l in range(nLevels):
             pSize = pSizes[l]
-            if pSize <= 4 or stepSizes[l]<1:
+            if pSize <= 4 or stepSizes[l] < 1:
                 continue
             for x in range(0, w - pSize, stepSizes[l]):
                 for y in range(0, h - pSize, stepSizes[l]):
@@ -246,6 +249,7 @@ class FeatureCreator:
                     metaInfo.append([(x+pSize/2.0)/w, (y+pSize/2.0)/h,
                                      nLevels - l, crop[pSize/2-cS:pSize/2+cS, pSize/2-cS:pSize/2+cS].mean()])
             print "%d patches, %dx%d - %d" % (len(patches), w, h, pSize)
+        patches = [scipy.misc.imresize(patch, (desH, desW), 'bilinear') for patch in patches]
         features = forward_pass(patches, self.net, self.transformer,
                                 batch_size=self.batch_size, layer_name=self.layer_name)
         return (features, np.vstack(metaInfo))

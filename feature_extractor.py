@@ -31,18 +31,19 @@ def get_arguments():
 
 
 def handle_patches(all_files, f_extractor, directory, rootPath):
-    import ipdb; ipdb.set_trace()
+#    import ipdb; ipdb.set_trace()
     if not os.path.exists(directory):
         os.makedirs(directory)
     mode = f_extractor.get_mode()
+    (height, width) = f_extractor.get_input_size()
     c = 0
     for file in all_files:
         # import ipdb; ipdb.set_trace()
-        (feats, meta) = f_extractor.get_grid_features(join(rootPath, file.strip()), mode)
+        (feats, meta) = f_extractor.get_grid_features(join(rootPath, file.strip()), mode, height, width)
         f = h5py.File(os.path.join(directory, os.path.basename(file.strip()) + "_" + str(c) + ".hdf5"), "w")
         c += 1
         data = f.create_dataset("feats", feats.shape, compression="gzip", compression_opts=9, dtype="float32")
-        pos = f.create_dataset("position", (meta.shape[0], 2), compression="gzip", compression_opts=9, dtype="uint16")
+        pos = f.create_dataset("position", (meta.shape[0], 2), compression="gzip", compression_opts=9, dtype="float32")
         level = f.create_dataset("level", (meta.shape[0], ), compression="gzip", compression_opts=9, dtype="uint16")
         depth = f.create_dataset("depth", (meta.shape[0], ), compression="gzip", compression_opts=9, dtype="float32")
         f.attrs['relative_path'] = file.strip()
