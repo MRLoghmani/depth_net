@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import h5py
-from sklearn.cross_validation import train_test_split
+from tqdm import tqdm
+from sklearn.cross_validation import train_test_split, KFold
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import normalize, StandardScaler
@@ -82,42 +83,27 @@ def is_alive(job):
 
 def prepare_jobs(split_dir, features, n_splits, jobs, classes, runParams):
     if runParams.tuneParams:
-        print "Running parameter optimization"
+        print "Running K fold parameter optimization"
         (X, y) = load_split(join(split_dir, args.split_prefix +
                                  'train_split_0.txt'), features, classes)
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=0.2, random_state=0)
-        tuned_parameters = [{'C': [0.0001, 0.001, 0.1, 1, 10, 100, 1000]}]
-        scores = ['precision', 'recall']
-        for score in scores:
-            print("# Tuning hyper-parameters for %s" % score)
-            print()
-
-            clf = GridSearchCV(svm.LinearSVC(dual=False), tuned_parameters, cv=5,
-                               scoring='%s_weighted' % score, n_jobs=8)
-            clf.fit(X_train, y_train)
-
-            print("Best parameters set found on development set:")
-            print()
-            print(clf.best_params_)
-            print()
-            print("Grid scores on development set:")
-            print()
-            for params, mean_score, scores in clf.grid_scores_:
-                print("%0.3f (+/-%0.03f) for %r"
-                      % (mean_score, scores.std() * 2, params))
-            print()
-
-            print("Detailed classification report:")
-            print()
-            print("The model is trained on the full development set.")
-            print("The scores are computed on the full evaluation set.")
-            print()
-            y_true, y_pred = y_test, clf.predict(X_test)
-            print(classification_report(y_true, y_pred))
-            print()
-            runParams.C = clf.best_params_['C']
-
+        if runParams.normalize:
+            X = normalize(X)
+        Cvals = [1e-2, 1e-1, 1, 1e1, 1e2, 1e3, 1e4]
+        best = (1, 0)
+        kf = KFold(X.shape[0], 5)
+        import ipdb; ipdb.set_trace()
+        for c in Cvals:
+            score = 0
+            for train, test in tqdm(kf):
+                dual = X[train].shape[0] < X[train].shape[1]
+                clf = svm.LinearSVC(dual=dual, C=c)
+                clf.fit(X[train], y[train])
+                score += clf.score(X[test], y[test])
+            score = score / len(kf)
+            print "%s mean %f dual: %s - C: %f, score: %f" % (str(X[train].shape), X[train].mean(), str(dual), c, score)
+            if score > best[1]:
+                best = (c, score)
+        runParams.C = best[0]
     jobs_todo = []
     jobs_running = []
     splits_acc = Array('d', range(n_splits))
@@ -163,17 +149,15 @@ def run_split(split_dir, features, n_splits, splits_acc, x, classes, runParams):
                                                      args.split_prefix + 'train_split_' + str(x) + '.txt'), features, classes)
     (test_features, test_labels) = load_split(join(split_dir,
                                                    args.split_prefix + 'test_split_' + str(x) + '.txt'), features, classes)
-    print "Loaded %s train and %s test - starting svm"
+    print "Loaded %s train and %s test - starting svm" % (str(train_features.shape), str(test_features.shape))
     if runParams.standardize:
         scaler = StandardScaler(copy=False)
         train_features = scaler.fit_transform(train_features)
         test_features = scaler.transform(test_features)
     if runParams.normalize:
-        start = time.time()
         print "Will normalize data"
         train_features = normalize(train_features, copy=False)
         test_features = normalize(test_features, copy=False)
-        print "It took %f seconds" % (time.time() - start)
     if runParams.save_kernel:
         print "Saving kernel"
         save_kernel_matrix(train_features, test_features, train_labels,
@@ -220,7 +204,9 @@ def do_svm(loaded_data, split_n, runParams):
         anova_svm.fit(train_data, loaded_data.train_labels)
         res = anova_svm.predict(test_data)
     else:
-        clf = svm.LinearSVC(dual=False, C=runParams.C)  # C=0.00001 good for JHUIT
+        dual = train_data.shape[0] < train_data.shape[1]
+        print "Svm params: C: %f, dual: %s" % (runParams.C, str(dual))
+        clf = svm.LinearSVC(dual=dual, C=runParams.C)  # C=0.00001 good for JHUIT
         clf.fit(train_data, loaded_data.train_labels)
         res = clf.predict(test_data)
 
