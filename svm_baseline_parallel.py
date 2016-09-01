@@ -33,6 +33,7 @@ class RunParams:
         self.standardize = args.standardize
         self.saveMargin = args.saveMargin
         self.SelectKBest = args.SelectKBest
+        self.penalty = args.penalty
 type_regex = re.compile(ur'_([depthcrop]+)\.png')
 
 LoadedData = namedtuple(
@@ -60,6 +61,7 @@ def get_arguments():
     parser.add_argument("--standardize", action="store_true")
     parser.add_argument("--C", type=float, default=1)
     parser.add_argument("--saveMargin", default=None)
+    parser.add_argument("--penalty", default='l2')
     args = parser.parse_args()
     return args
 
@@ -86,24 +88,37 @@ def prepare_jobs(split_dir, features, n_splits, jobs, classes, runParams):
         print "Running K fold parameter optimization"
         (X, y) = load_split(join(split_dir, args.split_prefix +
                                  'train_split_0.txt'), features, classes)
+        idx = np.arange(X.shape[0])
+        np.random.shuffle(idx)
+        X = X[idx]
+        y = y[idx]
+        if runParams.standardize:
+            sc = StandardScaler(copy=False)
+            X = sc.fit_transform(X)
         if runParams.normalize:
             X = normalize(X)
-        Cvals = [1e-2, 1e-1, 1, 1e1, 1e2, 1e3, 1e4]
-        best = (1, 0)
+        Cvals = [1e-2, 1e-1, 1, 1e1, 1e2, 1e3]
+        penalties = ['l1', 'l2']
+        best = (1, 'l2', 0)
         kf = KFold(X.shape[0], 5)
-        import ipdb; ipdb.set_trace()
-        for c in Cvals:
-            score = 0
-            for train, test in tqdm(kf):
-                dual = X[train].shape[0] < X[train].shape[1]
-                clf = svm.LinearSVC(dual=dual, C=c)
-                clf.fit(X[train], y[train])
-                score += clf.score(X[test], y[test])
-            score = score / len(kf)
-            print "%s mean %f dual: %s - C: %f, score: %f" % (str(X[train].shape), X[train].mean(), str(dual), c, score)
-            if score > best[1]:
-                best = (c, score)
+        for p in penalties:
+            for c in Cvals:
+                score = 0.0
+                for train, test in tqdm(kf):
+                    dual = X[train].shape[0] < X[train].shape[1]
+                    if p == 'l1':
+                        dual = False  # dual not supported with l1 penalty
+                        c = c * 100  # l1 needs less regularization
+                    clf = svm.LinearSVC(dual=dual, C=c, max_iter=50, penalty=p)
+                    clf.fit(X[train], y[train])
+                    score += clf.score(X[test], y[test])
+                score = score / len(kf)
+                print "%s mean %f dual: %s - C: %f, score: %f, P: %s" % (str(X[train].shape),
+                                                                         X[train].mean(), str(dual), c, score, p)
+                if score > best[2]:
+                    best = (c, p, score)
         runParams.C = best[0]
+        runParams.penalty = best[1]
     jobs_todo = []
     jobs_running = []
     splits_acc = Array('d', range(n_splits))
@@ -205,8 +220,8 @@ def do_svm(loaded_data, split_n, runParams):
         res = anova_svm.predict(test_data)
     else:
         dual = train_data.shape[0] < train_data.shape[1]
-        print "Svm params: C: %f, dual: %s" % (runParams.C, str(dual))
-        clf = svm.LinearSVC(dual=dual, C=runParams.C)  # C=0.00001 good for JHUIT
+        print "Svm params: C: %f, dual: %s, penalty %s" % (runParams.C, str(dual), runParams.penalty)
+        clf = svm.LinearSVC(dual=dual, C=runParams.C, penalty=runParams.penalty)  # C=0.00001 good for JHUIT
         clf.fit(train_data, loaded_data.train_labels)
         res = clf.predict(test_data)
 
