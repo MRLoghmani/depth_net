@@ -34,7 +34,7 @@ class RunParams:
         self.saveMargin = args.saveMargin
         self.SelectKBest = args.SelectKBest
         self.penalty = args.penalty
-type_regex = re.compile(ur'_([depthcrop]+)\.png')
+type_regex = re.compile(ur'_([rgbdepthcrop]+)\.png')
 
 LoadedData = namedtuple(
     "LoadedData", "train_patches train_labels test_patches test_labels")
