@@ -34,12 +34,8 @@ rand('state', 0);
 
 % Load the datasplit and distance matrix
 K = {
-load('../data/jhuit_rgb_kernel_20160718-075701-29f0.mat'), 
-load('../data/jhuit_normalized_kernel_20160718-075701-29f0.mat'), 
-%load('../data/jhuit_orig_kernel_20160718-075701-29f0.mat'),
-load('../data/jhuit_norm_kernel_default.mat'),
-%load('../data/jhuit_orig_kernel'),
-load('../data/jhuit_rgb_kernel.mat')
+'../data/kernels/jhuit_rgb_0'), 
+'../data/kernels/jhuit_depth_norm_0'), 
 };
 
 % Create the training data and testing data
@@ -47,8 +43,8 @@ NK=numel(K)
 Ktrain = zeros(7349, 7349, NK);
 Ktest = zeros(7349, 7349, NK);
 for i=1:NK
-  Ktrain(:,:,i) = K{i}.train_kernel;
-  Ktest(:,:,i) = K{i}.test_kernel;
+    Ktrain(:,:,i) = h5read(K{i}, '/train_kernel');
+    Ktest(:,:,i) = h5read(K{i}, '/test_kernel');
 end
 
 Ktrain = single(Ktrain);
@@ -57,8 +53,8 @@ Ktest = single(Ktest);
 disp 'Finished loading kernels'; 
 
 % gernate the labels of the dataset
-Ytrain = K{1}.train_labels+1;
-Ytest  = K{1}.test_labels+1;
+Ytrain = h5read(K{1}, '/train_labels') + 1;
+Ytest  = h5read(K{1}, '/test_labels') + 1;
   
 % Parameters for OBSCURE
 C                  = 100; %1000: 89.66 10: 90.33 0.1: 88
