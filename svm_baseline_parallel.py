@@ -136,7 +136,7 @@ def prepare_jobs(split_dir, features, n_splits, jobs, classes, runParams):
         time.sleep(0.3)
 
     print splits_acc[:]
-    print np.mean(splits_acc)
+    print "Mean %f std: %f" % (np.mean(splits_acc), np.std(splits_acc))
 
 
 def load_split(split_path, feat_dict, classes):
@@ -182,12 +182,21 @@ def run_split(split_dir, features, n_splits, splits_acc, x, classes, runParams):
 
 
 def save_kernel_matrix(train_data, test_data, train_labels, test_labels, out_name):
-    data = {}
-    data["train_kernel"] = train_data.dot(train_data.T)
-    data["test_kernel"] = train_data.dot(test_data.T)
-    data["train_labels"] = train_labels
-    data["test_labels"] = test_labels
-    io.savemat(out_name, mdict=data)
+    f = h5py.File(out_name, "w")
+    trainK = f.create_dataset("train_kernel", (train_data.shape[0], train_data.shape[0]),
+                              compression="gzip", compression_opts=9, dtype="float32")
+    testK = f.create_dataset("test_kernel", (train_data.shape[0], test_data.shape[0]),
+                             compression="gzip", compression_opts=9, dtype="float32")
+    trainL = f.create_dataset("train_labels", (train_data.shape[0], ), compression="gzip",
+                              compression_opts=9, dtype="uint16")
+    testL = f.create_dataset("test_labels", (train_data.shape[0], ), compression="gzip",
+                             compression_opts=9, dtype="uint16")
+
+    trainK[:] = train_data.dot(train_data.T)
+    trainL[:] = train_labels
+    testK[:] = train_data.dot(test_data.T)
+    testL[:] = test_labels
+    f.close()
 
 
 def do_svm(loaded_data, split_n, runParams):
