@@ -34,8 +34,8 @@ rand('state', 0);
 
 % Load the datasplit and distance matrix
 K = {
-'../data/kernels/jhuit_rgb_0'), 
-'../data/kernels/jhuit_depth_norm_0'), 
+'../data/kernels/jhuit_rgb_0', 
+'../data/kernels/jhuit_depth_norm_0', 
 };
 
 % Create the training data and testing data
