@@ -95,12 +95,13 @@ def load_image(path, height, width, mode='RGB'):
         (RGB for color or L for grayscale)
     """
     image = PIL.Image.open(path)
+#    import ipdb; ipdb.set_trace()
     try:
-        im = convert_image(image, mode)
+        image = image.resize((width, height), PIL.Image.BILINEAR)
     except:
         print "Problem with image %s" % path
         return None
-    return scipy.misc.imresize(im, (height, width), 'bilinear')
+    return convert_image(image, mode)
 
 
 def convert_image(image, mode):
