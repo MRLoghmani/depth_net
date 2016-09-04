@@ -34,6 +34,7 @@ class RunParams:
         self.saveMargin = args.saveMargin
         self.SelectKBest = args.SelectKBest
         self.penalty = args.penalty
+        self.skip_svm = args.skip_svm
 type_regex = re.compile(ur'_([rgbdepthcrop]+)\.png')
 
 LoadedData = namedtuple(
@@ -62,6 +63,7 @@ def get_arguments():
     parser.add_argument("--C", type=float, default=1)
     parser.add_argument("--saveMargin", default=None)
     parser.add_argument("--penalty", default='l2')
+    parser.add_argument("--skip_svm", action="store_true")
     args = parser.parse_args()
     return args
 
@@ -177,6 +179,8 @@ def run_split(split_dir, features, n_splits, splits_acc, x, classes, runParams):
         print "Saving kernel"
         save_kernel_matrix(train_features, test_features, train_labels,
                            test_labels, runParams.kernel_name + "_" + str(x))
+    if runParams.skip_svm:
+        return
     splits_acc[x] = do_svm(LoadedData(
         train_features, train_labels, test_features, test_labels), x, runParams)
 
@@ -189,7 +193,7 @@ def save_kernel_matrix(train_data, test_data, train_labels, test_labels, out_nam
                              compression="gzip", compression_opts=9, dtype="float32")
     trainL = f.create_dataset("train_labels", (train_data.shape[0], ), compression="gzip",
                               compression_opts=9, dtype="uint16")
-    testL = f.create_dataset("test_labels", (train_data.shape[0], ), compression="gzip",
+    testL = f.create_dataset("test_labels", (test_data.shape[0], ), compression="gzip",
                              compression_opts=9, dtype="uint16")
 
     trainK[:] = train_data.dot(train_data.T)

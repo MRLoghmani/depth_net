@@ -205,10 +205,13 @@ class FeatureCreator:
             im = load_image(image_file, height, width, mode)
             images.append(im)
         mean = 0.0
+        avg_range = 0.0
         for im in images:
             mean += im.mean()
+            avg_range += im.max() - im.min()
         mean = self.scale * mean / len(images)
-        print "Image mean: %f" % mean
+        avg_range = self.scale * avg_range / len(images)
+        print "Image mean: %f, range %f" % (mean, avg_range)
         if self.center_data:
             self.transformer.set_mean('data', np.ones(self.transformer.inputs['data'][1]) * mean)
             print "Will center data"
