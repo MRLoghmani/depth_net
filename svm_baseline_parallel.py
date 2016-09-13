@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import h5py
 from tqdm import tqdm
-from sklearn.neighbors import LSHForest
 from sklearn.cross_validation import train_test_split, KFold
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import classification_report
@@ -242,7 +241,7 @@ def do_svm(loaded_data, split_n, runParams):
             clf = svm.LinearSVC(dual=dual, C=runParams.C, penalty=runParams.penalty)  # C=0.00001 good for JHUIT
         else: 
             print "Running KNN"
-            clf = LSHForest(n_neighbors=3)
+            clf = KNeighborsClassifier(n_neighbors=3)
         clf.fit(train_data, loaded_data.train_labels)
         res = clf.predict(test_data)
 
