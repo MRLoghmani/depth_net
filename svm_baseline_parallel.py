@@ -236,7 +236,7 @@ def do_svm(loaded_data, split_n, runParams):
         res = anova_svm.predict(test_data)
     else:
         dual = train_data.shape[0] < train_data.shape[1]
-        if runParams.doKNN is None:
+        if runParams.doKNN is True:
             print "Svm params: C: %f, dual: %s, penalty %s" % (runParams.C, str(dual), runParams.penalty)
             clf = svm.LinearSVC(dual=dual, C=runParams.C, penalty=runParams.penalty)  # C=0.00001 good for JHUIT
         else: 
