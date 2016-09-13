@@ -8,6 +8,7 @@ from argparse import ArgumentParser
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 
+
 def get_arguments():
     parser = ArgumentParser()
     parser.add_argument("feature_dict")
@@ -15,6 +16,8 @@ def get_arguments():
     parser.add_argument("outname")
     parser.add_argument("--n_classes", default=51, type=int)
     parser.add_argument("--precomputed", default=None)
+    parser.add_argument("--N", default=1, type=int)
+    parser.add_argument("--label_names", default=None)
     return parser.parse_args()
 
 
@@ -46,12 +49,22 @@ def load_split(split_path, feat_dict, classes):
     return (features, labels)
 
 
-def plot_classes(feats, labels, classes):
-    colors = cm.Paired(np.linspace(0, 1, classes))
-    N = 8
-    for c in range(classes/N):
-        idx = labels == c
-        plt.scatter(feats[idx,0], feats[idx,1], color=colors[c*N])
+def onpick(event, labels, label_names):
+    index = event.ind
+    print '--------------'
+    lbls = labels[index]
+    if label_names is None:
+        print lbls
+    else:
+        print [label_names[label.astype('int8')].strip() for label in lbls]
+
+
+def plot_classes(feats, labels, classes, N, label_names):
+    figure = plt.figure()
+    idx = labels < (classes/N)
+    plt.scatter(feats[idx, 0], feats[idx, 1], c=labels[idx], edgecolors=None, linewidths=0, picker=3)
+    plt.colorbar()
+    figure.canvas.mpl_connect('pick_event', lambda event: onpick(event, labels[idx], label_names))
     plt.show()
 
 if __name__ == '__main__':
@@ -75,4 +88,8 @@ if __name__ == '__main__':
         feats = model.fit_transform(feats)
         print "Will now visualize data %s (took %f)" % (str(feats.shape), (time.time()-start))
         pickle.dump((feats,labels), open(args.outname, "w"), pickle.HIGHEST_PROTOCOL)
-    plot_classes(feats, labels, args.n_classes)
+    if args.label_names:
+        label_names = open(args.label_names).readlines()
+    else:
+        label_names = None
+    plot_classes(feats, labels, args.n_classes, args.N, label_names)
