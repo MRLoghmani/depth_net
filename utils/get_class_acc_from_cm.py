@@ -25,4 +25,4 @@ if __name__ == '__main__':
         outpath = args.outpath
     else:
         outpath = "accuracy_per_class.txt"
-        np.savetxt(open(outpath, 'w'), acc_class)
+    np.savetxt(open(outpath, 'w'), acc_class)
