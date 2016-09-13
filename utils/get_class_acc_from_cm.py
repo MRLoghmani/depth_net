@@ -12,9 +12,9 @@ def get_args():
 
 
 def merge_cm(cm_root, splits):
-    globalCM = np.loadtxt(cm_root + '0')
+    globalCM = np.loadtxt(cm_root + '0.csv')
     for x in range(1, splits):
-        globalCM += np.loadtxt(cm_root + str(x))
+        globalCM += np.loadtxt(cm_root + str(x) + '.csv')
     return globalCM
 
 if __name__ == '__main__':

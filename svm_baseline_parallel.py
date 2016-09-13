@@ -4,6 +4,7 @@ from tqdm import tqdm
 from sklearn.cross_validation import train_test_split, KFold
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import classification_report
+from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import normalize, StandardScaler
 import re
 import pickle
@@ -35,6 +36,7 @@ class RunParams:
         self.SelectKBest = args.SelectKBest
         self.penalty = args.penalty
         self.skip_svm = args.skip_svm
+        self.doKNN = args.doKNN
 type_regex = re.compile(ur'_([rgbdepthcrop]+)\.png')
 
 LoadedData = namedtuple(
@@ -64,6 +66,7 @@ def get_arguments():
     parser.add_argument("--saveMargin", default=None)
     parser.add_argument("--penalty", default='l2')
     parser.add_argument("--skip_svm", action="store_true")
+    parser.add_argument("--doKNN", action="store_true")
     args = parser.parse_args()
     return args
 
@@ -233,8 +236,12 @@ def do_svm(loaded_data, split_n, runParams):
         res = anova_svm.predict(test_data)
     else:
         dual = train_data.shape[0] < train_data.shape[1]
-        print "Svm params: C: %f, dual: %s, penalty %s" % (runParams.C, str(dual), runParams.penalty)
-        clf = svm.LinearSVC(dual=dual, C=runParams.C, penalty=runParams.penalty)  # C=0.00001 good for JHUIT
+        if runParams.doKNN is None:
+            print "Svm params: C: %f, dual: %s, penalty %s" % (runParams.C, str(dual), runParams.penalty)
+            clf = svm.LinearSVC(dual=dual, C=runParams.C, penalty=runParams.penalty)  # C=0.00001 good for JHUIT
+        else: 
+            print "Running KNN"
+            clf = KNeighborsClassifier(n_neighbors=3)
         clf.fit(train_data, loaded_data.train_labels)
         res = clf.predict(test_data)
 
