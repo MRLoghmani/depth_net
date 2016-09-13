@@ -28,41 +28,44 @@
 %    Contact the authors: francesco [at] orabona.com
 %                         jluo      [at] idiap.ch
 
-clear
+%clear
 close all
 rand('state', 0);
 
+fprintf('Will load split %d', SPLIT)
 % Load the datasplit and distance matrix
 K = {
-'../data/kernels/jhuit_rgb_0', 
-'../data/kernels/jhuit_depth_norm_0', 
+%strcat('../data/kernels/jhuit_rgb_',num2str(SPLIT)), 
+strcat('../data/kernels/jhuit_depth_norm_', num2str(SPLIT)), 
+%strcat('../data/kernels/jhuit_20160718-075701-29f0_normalized__', num2str(SPLIT))
+strcat('../data/kernels/jhuit_20160905-134530-42ea_snapshot_iter_121912_norm_', num2str(SPLIT))
 };
 
+% gernate the labels of the dataset
+Ytrain = h5read(K{1}, '/train_labels')' + 1;
+Ytest  = h5read(K{1}, '/test_labels')' + 1;
+trainS = size(Ytrain, 2)
+testS = size(Ytest, 2)
 % Create the training data and testing data
 NK=numel(K)
-Ktrain = zeros(7349, 7349, NK);
-Ktest = zeros(7349, 7349, NK);
+Ktrain = zeros(trainS, trainS, NK);
+Ktest = zeros(trainS, testS, NK);
 for i=1:NK
-    Ktrain(:,:,i) = h5read(K{i}, '/train_kernel');
-    Ktest(:,:,i) = h5read(K{i}, '/test_kernel');
+    Ktrain(:,:,i) = h5read(K{i}, '/train_kernel')';
+    Ktest(:,:,i) = h5read(K{i}, '/test_kernel')';
 end
 
 Ktrain = single(Ktrain);
 Ktest = single(Ktest);
 
 disp 'Finished loading kernels'; 
-
-% gernate the labels of the dataset
-Ytrain = h5read(K{1}, '/train_labels')' + 1;
-Ytest  = h5read(K{1}, '/test_labels')' + 1;
-  
+ 
 % Parameters for OBSCURE
-C                  = 1; %1000: 89.66 10: 90.33 0.1: 88
 model_zero         = model_init();
 model_zero.n_cla   = 49;
 model_zero.T1      = 100;   % Maximum number of epochs for the online stage
 model_zero.T2      = 300;   % Maximum number of epochs for the batch stage
-model_zero.p       = 1.05; % 1.05;
+model_zero.p       = P % 1.05; % 1.05;
 model_zero.lambda  = 1/(C*numel(Ytrain));
 model_zero.eta     = 2;
 
