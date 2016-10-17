@@ -8,6 +8,7 @@ import PIL.Image
 import scipy.misc
 import time
 from tqdm import tqdm
+from Estimator import Estimator
 
 
 def get_net(caffemodel, deploy_file, use_gpu=True, GPU_ID=0):
@@ -45,9 +46,7 @@ def get_transformer(deploy_file, mean_file=None, mean_pixel=None):
     else:
         dims = network.input_dim[:4]
 
-    t = caffe.io.Transformer(
-        inputs={'data': dims}
-    )
+    t = caffe.io.Transformer(inputs={'data': dims})
     # transpose to (channels, height, width)
     t.set_transpose('data', (2, 0, 1))
 
@@ -65,7 +64,8 @@ def get_transformer(deploy_file, mean_file=None, mean_pixel=None):
             if blob.HasField('shape'):
                 blob_dims = blob.shape
                 assert len(
-                    blob_dims) == 4, 'Shape should have 4 dimensions - shape is "%s"' % blob.shape
+                    blob_dims
+                ) == 4, 'Shape should have 4 dimensions - shape is "%s"' % blob.shape
             elif blob.HasField('num') and blob.HasField('channels') and \
                     blob.HasField('height') and blob.HasField('width'):
                 blob_dims = (blob.num, blob.channels, blob.height, blob.width)
@@ -95,7 +95,7 @@ def load_image(path, height, width, mode='RGB'):
         (RGB for color or L for grayscale)
     """
     image = PIL.Image.open(path)
-#    import ipdb; ipdb.set_trace()
+    #    import ipdb; ipdb.set_trace()
     try:
         image = image.resize((width, height), PIL.Image.BILINEAR)
     except:
@@ -130,7 +130,7 @@ def forward_pass(images, net, transformer, batch_size=1, layer_name='fc7'):
     batch_size -- how many images can be processed at once
         (a high value may result in out-of-memory errors)
     """
-#    import ipdb; ipdb.set_trace()
+    #    import ipdb; ipdb.set_trace()
     batch_size = min(batch_size, len(images))
     caffe_images = []
     for image in images:
@@ -140,36 +140,95 @@ def forward_pass(images, net, transformer, batch_size=1, layer_name='fc7'):
             caffe_images.append(image)
 
     dims = transformer.inputs['data'][1:]
-#    import ipdb; ipdb.set_trace()
+    #    import ipdb; ipdb.set_trace()
     fsize = net.blobs[layer_name].data.size / \
         net.blobs[layer_name].data.shape[0]
     features = np.empty((len(images), fsize), dtype='float32')
-    todoChunks = [caffe_images[x:x + batch_size]
-                  for x in xrange(0, len(caffe_images), batch_size)]
+    todoChunks = [
+        caffe_images[x:x + batch_size]
+        for x in xrange(0, len(caffe_images), batch_size)
+    ]
     start = time.clock()
     idx = 0
     for k, chunk in tqdm(list(enumerate(todoChunks))):
         bsize = len(chunk)
-        new_shape = (bsize,) + tuple(dims)
+        new_shape = (bsize, ) + tuple(dims)
         if net.blobs['data'].data.shape != new_shape:
             net.blobs['data'].reshape(*new_shape)
         for index, image in enumerate(chunk):
             image_data = transformer.preprocess('data', image)
             net.blobs['data'].data[index] = image_data
         net.forward()
-        features[idx:idx + bsize] = net.blobs[
-            layer_name].data.reshape(-1, net.blobs[layer_name].data.size / bsize).copy()
+        features[idx:idx + bsize] = net.blobs[layer_name].data.reshape(
+            -1, net.blobs[layer_name].data.size / bsize).copy()
         idx += bsize
     print "It took %f" % (time.clock() - start)
     return features
+
+
+def forward_pass_multi(images, net, transformer, batch_size,
+                       layer_names):
+    """
+    Returns scores for each image as an np.ndarray (nImages x nClasses)
+    Arguments:
+    images -- a list of np.ndarrays
+    net -- a caffe.Net
+    transformer -- a caffe.io.Transformer
+    Keyword arguments:
+    batch_size -- how many images can be processed at once
+        (a high value may result in out-of-memory errors)
+    """
+    batch_size = min(batch_size, len(images))
+    caffe_images = []
+    for image in images:
+        if image.ndim == 2:
+            caffe_images.append(image[:, :, np.newaxis])
+        else:
+            caffe_images.append(image)
+
+    dims = transformer.inputs['data'][1:]
+    feat_holder = []
+    for layer_name in layer_names:
+        fsize = net.blobs[layer_name].data.size / \
+                net.blobs[layer_name].data.shape[0]
+        feat_holder.append(np.empty((len(images), fsize), dtype='float32'))
+    todoChunks = [
+        caffe_images[x:x + batch_size]
+        for x in xrange(0, len(caffe_images), batch_size)
+    ]
+    start = time.clock()
+    idx = 0
+    for k, chunk in tqdm(list(enumerate(todoChunks))):
+        bsize = len(chunk)
+        new_shape = (bsize, ) + tuple(dims)
+        if net.blobs['data'].data.shape != new_shape:
+            net.blobs['data'].reshape(*new_shape)
+        for index, image in enumerate(chunk):
+            image_data = transformer.preprocess('data', image)
+            net.blobs['data'].data[index] = image_data
+        net.forward()
+        for layer_id, layer_name in layer_names:
+            features = feat_holder[layer_id]
+            features[idx:idx + bsize] = net.blobs[layer_name].data.reshape(
+                -1, net.blobs[layer_name].data.size / bsize).copy()
+        idx += bsize
+    print "It took %f" % (time.clock() - start)
+    return feat_holder
 
 
 class FeatureCreator:
     """This class keeps computed features in memory
     and returns them when requested"""
 
-    def __init__(self, net_proto, net_weights, mean_pixel=None, mean_file=None,
-                 use_gpu=True, layer_name='fc7', verbose=False, gpu_id=0):
+    def __init__(self,
+                 net_proto,
+                 net_weights,
+                 mean_pixel=None,
+                 mean_file=None,
+                 use_gpu=True,
+                 layer_name='fc7',
+                 verbose=False,
+                 gpu_id=0):
         self.net = get_net(net_weights, net_proto, use_gpu, gpu_id)
         self.transformer = get_transformer(
             net_proto, mean_pixel=mean_pixel, mean_file=mean_file)
@@ -193,11 +252,13 @@ class FeatureCreator:
         return mode
 
     def get_input_size(self):
-        old_batch_size, channels, height, width = self.transformer.inputs['data']
+        old_batch_size, channels, height, width = self.transformer.inputs[
+            'data']
         return (height, width)
-    
+
     def prepare_features(self, image_files):
-        old_batch_size, channels, height, width = self.transformer.inputs['data']
+        old_batch_size, channels, height, width = self.transformer.inputs[
+            'data']
         mode = self.get_mode()
         print "Loading images"
         images = []
@@ -216,43 +277,17 @@ class FeatureCreator:
         avg_range = self.scale * avg_range / len(images)
         print "Image mean: %f, range %f - max: %f" % (mean, avg_range, max)
         if self.center_data:
-            self.transformer.set_mean('data', np.ones(self.transformer.inputs['data'][1]) * mean)
+            self.transformer.set_mean(
+                'data', np.ones(self.transformer.inputs['data'][1]) * mean)
             print "Will center data"
         # Classify the image
         print "Extracting features"
-        feats = forward_pass(images, self.net,  self.transformer,
-                             batch_size=self.batch_size, layer_name=self.layer_name)
-        i = 0
-        # load the features in a map with their path as key
-        for f in image_files:
-            # saves only the relative path
-            short_name = f.replace(self.data_prefix, '')
-            if short_name[0] == '/':
-                short_name = short_name[1:]
-            self.features[short_name] = feats[i].reshape(feats[i].size)
-            i += 1
-        self.net = None  # free video memory
-        
-    def prepare_features_iter(self, image_files, batch_size=1024):
-        old_batch_size, channels, height, width = self.transformer.inputs['data']
-        mode = self.get_mode()
-        print "Loading images"
-        images = []
-        for image_file in image_files:
-            im = load_image(image_file, height, width, mode)
-            images.append(im)
-        mean = 0.0
-        for im in images:
-            mean += im.mean(axis=tuple((0, 1)))
-        mean = self.scale * mean / len(images)
-        print "Image mean: %f" % (mean)
-        if self.center_data:
-            self.transformer.set_mean('data', np.ones(self.transformer.inputs['data'][1]) * mean)
-            print "Will center data"
-        # Classify the image
-        print "Extracting features"
-        feats = forward_pass(images, self.net,  self.transformer,
-                             batch_size=self.batch_size, layer_name=self.layer_name)
+        feats = forward_pass(
+            images,
+            self.net,
+            self.transformer,
+            batch_size=self.batch_size,
+            layer_name=self.layer_name)
         i = 0
         # load the features in a map with their path as key
         for f in image_files:
@@ -264,6 +299,33 @@ class FeatureCreator:
             i += 1
         self.net = None  # free video memory
 
+    def prepare_features_iter(self, image_files, _batch_size=1024):
+        old_batch_size, channels, height, width = self.transformer.inputs[
+            'data']
+        mode = self.get_mode()
+        print "Loading images"
+        images = []
+        for image_file in image_files:
+            im = load_image(image_file, height, width, mode)
+            images.append(im)
+        es = Estimator()
+        for im in images:
+            es.push(im.mean(axis=tuple((0, 1))))
+        mean = self.scale * es.get_mean()
+        print "Image mean: %f" % (mean)
+        if self.center_data:
+            self.transformer.set_mean('data', mean)
+            # np.ones(self.transformer.inputs['data'][1]) * mean)
+            print "Will center data"
+        # Classify the image
+        print "Extracting features"
+        layers = ['fc6', 'fc7']
+        feat_holder = forward_pass_multi(images, self.net, self.transformer, self.batch_size, layers)
+        est = Estimator()
+        for feats in feat_holder:
+            for i in range(feats.shape[0]):
+                est.push(feats[i].reshape(feats[i].size))
+
     def get_grid_features(self, image_path, mode, desH, desW):
         data = convert_image(PIL.Image.open(image_path), mode)
         (h, w) = data.shape[0:2]  # the third dim might be present for RGB
@@ -272,9 +334,14 @@ class FeatureCreator:
         pSizes = (np.array([0.16, 0.32, 0.64]) * maxSize).astype('uint16')
         nLevels = pSizes.size
         # better fixed step size or variable step size?
-        stepSizes = np.ones(nLevels, dtype='int8') * pSizes[0]/2  # pSizes / 2 step size is half of feature size
+        stepSizes = np.ones(
+            nLevels, dtype='int8') * pSizes[
+                0] / 2  # pSizes / 2 step size is half of feature size
         patches = [data]  # start with the whole image
-        metaInfo = [[0.5, 0.5, 0, data[h/2-cS:h/2+cS, w/2-cS:w/2+cS].mean()]]
+        metaInfo = [[
+            0.5, 0.5, 0, data[h / 2 - cS:h / 2 + cS, w / 2 - cS:w / 2 + cS]
+            .mean()
+        ]]
         for l in range(nLevels):
             pSize = pSizes[l]
             if pSize <= 4 or stepSizes[l] < 1:
@@ -284,12 +351,21 @@ class FeatureCreator:
                     crop = data[y:y + pSize, x:x + pSize]
                     patches.append(crop)
                     # x, y, patch level, depth of center area
-                    metaInfo.append([(x+pSize/2.0)/w, (y+pSize/2.0)/h,
-                                     nLevels - l, crop[pSize/2-cS:pSize/2+cS, pSize/2-cS:pSize/2+cS].mean()])
+                    metaInfo.append([(x + pSize / 2.0) / w,
+                                     (y + pSize / 2.0) / h, nLevels - l,
+                                     crop[pSize / 2 - cS:pSize / 2 + cS, pSize
+                                          / 2 - cS:pSize / 2 + cS].mean()])
             print "%d patches, %dx%d - %d" % (len(patches), w, h, pSize)
-        patches = [scipy.misc.imresize(patch, (desH, desW), 'bilinear') for patch in patches]
-        features = forward_pass(patches, self.net, self.transformer,
-                                batch_size=self.batch_size, layer_name=self.layer_name)
+        patches = [
+            scipy.misc.imresize(patch, (desH, desW), 'bilinear')
+            for patch in patches
+        ]
+        features = forward_pass(
+            patches,
+            self.net,
+            self.transformer,
+            batch_size=self.batch_size,
+            layer_name=self.layer_name)
         return (features, np.vstack(metaInfo))
 
     def get_features(self, image_path):
@@ -306,4 +382,10 @@ class FeatureCreator:
         self.scale = scale
 
     def do_forward_pass(self, data):
-        return forward_pass(data, self.net, self.transformer, self.verbose, batch_size=self.batch_size, layer_name=self.layer_name)
+        return forward_pass(
+            data,
+            self.net,
+            self.transformer,
+            self.verbose,
+            batch_size=self.batch_size,
+            layer_name=self.layer_name)

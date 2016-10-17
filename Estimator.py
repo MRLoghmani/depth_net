@@ -1,7 +1,8 @@
-import numpy as np
+# -*- coding: utf-8 -*-
 # Based on code from http://www.johndcook.com/blog/standard_deviation/
 # Original algorithm in 1962 paper by B. P. Welford and is presented
 # in Donald Knuth’s Art of Computer Programming, Vol 2, page 232, 3rd edition.
+import numpy as np
 
 
 class Estimator:
