@@ -195,7 +195,7 @@ class FeatureCreator:
     def get_input_size(self):
         old_batch_size, channels, height, width = self.transformer.inputs['data']
         return (height, width)
-
+    
     def prepare_features(self, image_files):
         old_batch_size, channels, height, width = self.transformer.inputs['data']
         mode = self.get_mode()
@@ -215,6 +215,37 @@ class FeatureCreator:
         mean = self.scale * mean / len(images)
         avg_range = self.scale * avg_range / len(images)
         print "Image mean: %f, range %f - max: %f" % (mean, avg_range, max)
+        if self.center_data:
+            self.transformer.set_mean('data', np.ones(self.transformer.inputs['data'][1]) * mean)
+            print "Will center data"
+        # Classify the image
+        print "Extracting features"
+        feats = forward_pass(images, self.net,  self.transformer,
+                             batch_size=self.batch_size, layer_name=self.layer_name)
+        i = 0
+        # load the features in a map with their path as key
+        for f in image_files:
+            # saves only the relative path
+            short_name = f.replace(self.data_prefix, '')
+            if short_name[0] == '/':
+                short_name = short_name[1:]
+            self.features[short_name] = feats[i].reshape(feats[i].size)
+            i += 1
+        self.net = None  # free video memory
+        
+    def prepare_features_iter(self, image_files, batch_size=1024):
+        old_batch_size, channels, height, width = self.transformer.inputs['data']
+        mode = self.get_mode()
+        print "Loading images"
+        images = []
+        for image_file in image_files:
+            im = load_image(image_file, height, width, mode)
+            images.append(im)
+        mean = 0.0
+        for im in images:
+            mean += im.mean(axis=tuple((0, 1)))
+        mean = self.scale * mean / len(images)
+        print "Image mean: %f" % (mean)
         if self.center_data:
             self.transformer.set_mean('data', np.ones(self.transformer.inputs['data'][1]) * mean)
             print "Will center data"

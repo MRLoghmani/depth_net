@@ -184,8 +184,14 @@ def run_split(split_dir, features, n_splits, splits_acc, x, classes, runParams):
                            test_labels, runParams.kernel_name + "_" + str(x))
     if runParams.skip_svm:
         return
-    splits_acc[x] = do_svm(LoadedData(
+    (splits_acc[x], svm) = do_svm(LoadedData(
         train_features, train_labels, test_features, test_labels), x, runParams)
+    new_feats = {}
+    for im_path in features.keys():
+        margin = svm.decision_function(features[im_path].reshape(1, -1))
+        new_feats[im_path] = margin.ravel()
+    with open('test_margins.pkl', 'w') as tmp:
+        pickle.dump(new_feats, tmp)
 
 
 def save_kernel_matrix(train_data, test_data, train_labels, test_labels, out_name):
@@ -262,7 +268,7 @@ def do_svm(loaded_data, split_n, runParams):
     end = time.time()
     print "Split " + str(split_n) + " Got " + str((100.0 * correct) / loaded_data.test_labels.size) \
         + "% correct, took " + str(end - start) + " seconds "
-    return (100.0 * correct) / loaded_data.test_labels.size
+    return ((100.0 * correct) / loaded_data.test_labels.size), clf
 
 
 def get_readable_list(name, f):
