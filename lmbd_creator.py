@@ -4,7 +4,7 @@ import argparse
 import cv2
 import sys
 import os
-caffe_root = '/home/hades/caffe/'  # this file should be run from {caffe_root}/examples (otherwise change this line)
+caffe_root = '/home/athena/caffe/'  # this file should be run from {caffe_root}/examples (otherwise change this line)
 sys.path.insert(0, caffe_root + 'python')
 import caffe
 def parse_args():
@@ -27,8 +27,8 @@ args = parse_args()
 # transaction.
 images = open(args.input_file).readlines()
 num_files  = len(images)
-map_size = num_files * res * res * 4  # 2 is because we have 16bit data
-
+#map_size = num_files * res * res * 4  # 2 is because we have 16bit data
+map_size = 2147483648
 env = lmdb.open(args.output_folder, map_size=map_size)
 
 if (args.bits=='8'):
