@@ -207,7 +207,7 @@ def forward_pass_multi(images, net, transformer, batch_size,
             image_data = transformer.preprocess('data', image)
             net.blobs['data'].data[index] = image_data
         net.forward()
-        for layer_id, layer_name in layer_names:
+        for layer_id, layer_name in enumerate(layer_names):
             features = feat_holder[layer_id]
             features[idx:idx + bsize] = net.blobs[layer_name].data.reshape(
                 -1, net.blobs[layer_name].data.size / bsize).copy()
@@ -300,31 +300,34 @@ class FeatureCreator:
         self.net = None  # free video memory
 
     def prepare_features_iter(self, image_files, _batch_size=1024):
+#        import ipdb; ipdb.set_trace()
         old_batch_size, channels, height, width = self.transformer.inputs[
             'data']
         mode = self.get_mode()
         print "Loading images"
         images = []
+        es = Estimator()
         for image_file in image_files:
             im = load_image(image_file, height, width, mode)
             images.append(im)
-        es = Estimator()
-        for im in images:
             es.push(im.mean(axis=tuple((0, 1))))
         mean = self.scale * es.get_mean()
-        print "Image mean: %f" % (mean)
+        print "Image mean: %s" % str(mean)
         if self.center_data:
             self.transformer.set_mean('data', mean)
-            # np.ones(self.transformer.inputs['data'][1]) * mean)
             print "Will center data"
         # Classify the image
         print "Extracting features"
         layers = ['fc6', 'fc7']
         feat_holder = forward_pass_multi(images, self.net, self.transformer, self.batch_size, layers)
-        est = Estimator()
-        for feats in feat_holder:
+        stats = {}
+        for i, val in enumerate(layers):
+            feats = feat_holder[i]
+            est = Estimator()
             for i in range(feats.shape[0]):
-                est.push(feats[i].reshape(feats[i].size))
+                est.push(feats[i].ravel())
+            stats[val] = (est.get_mean(), est.get_std())
+        return stats
 
     def get_grid_features(self, image_path, mode, desH, desW):
         data = convert_image(PIL.Image.open(image_path), mode)

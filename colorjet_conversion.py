@@ -16,21 +16,73 @@ def get_arguments():
     parser.add_argument("--ext", default="")
     parser.add_argument("--invert", action="store_true")
     parser.add_argument("--buggy", action="store_true")
-    parser.add_argument("--cropRatio", type=float, help="Value between 0 and 1, represents the percentage of the image to keep")
+    parser.add_argument("--force_norm", action="store_true")
+    parser.add_argument("--cropRatio", type=float,
+                        help="Value between 0 and 1, represents the percentage of the image to keep")
     args = parser.parse_args()
     return args
 
+
 def crop_from_center(image, cropRatio):
-    (w,h) = image.shape
+    (w, h) = image.shape
     nw = 0.5*w*cropRatio
     nh = 0.5*h*cropRatio
     return image[int(w/2 - nw):int(w/2 + nw), int(h/2 - nh):int(h/2 + nh)]
 
+
+def smart_norm(img, force_norm):
+    # import ipdb; ipdb.set_trace()
+    img = img.astype("float32")
+    flat = img.ravel()
+    ordered = np.argsort(flat)
+    oldval = 0
+    delta = 10
+    for i, val in enumerate(ordered):
+        diff = flat[val] - oldval
+        if diff > delta:
+            flat[ordered[i:]] -= (diff - delta)
+        oldval = flat[val]
+    max = img.max()
+    if force_norm or max > 255.0:
+        img = (255 / max) * img
+    return add_padding(img)
+
+
+def add_padding(imrange):
+    imsz = imrange.shape
+    mxdim = np.max(imsz)
+
+    offs_col = (mxdim - imsz[1])/2
+    offs_row = (mxdim - imsz[0])/2
+    nchan = 1
+    if(len(imsz) == 3):
+        nchan = imsz[2]
+    imgcanvas = np.zeros((mxdim, mxdim, nchan), dtype='uint8')
+    imgcanvas[offs_row:offs_row+imsz[0], offs_col:offs_col+imsz[1]] = img.reshape((imsz[0], imsz[1], nchan))
+    # take rows
+    if(offs_row):
+        tr = img[0, :]
+        br = img[-1, :]
+        imgcanvas[0:offs_row, :, 0] = np.tile(tr, (offs_row, 1))
+        imgcanvas[-offs_row-1:, :, 0] = np.tile(br, (offs_row+1, 1))
+    # take cols
+    if(offs_col):
+        lc = img[:, 0]
+        rc = img[:, -1]
+        imgcanvas[:, 0:offs_col, 0] = np.tile(lc, (offs_col, 1)).transpose()
+        imgcanvas[:, -offs_col-1:, 0] = np.tile(rc, (offs_col+1, 1)).transpose()
+
+    # RESCALE
+    imrange_rescale = cv2.resize(imgcanvas, IMSIZE, interpolation=cv2.INTER_CUBIC)
+    return(imrange_rescale)
+
+
 # Attention: the colorized depth image definition is: Red (close), blue(far)
-# For TESTING pre-trained caffemodels use this function provided in this script 
+# For TESTING pre-trained caffemodels use this function provided in this script
 # Note that the opposite definition can be found in function depth2jet.cpp blue(close), red(far)
 # When re-training the network it should not make a difference, but the second definition, is necessary
-# for noise augmentation. Nan values (which we convert to 0 distance) are therefore dark blue and close objects are also blue.
+# for noise augmentation. Nan values (which we convert to 0 distance) are therefore dark blue and
+# close objects are also blue.
 def scaleit_experimental(img, invert, buggy, cropRatio):
     img_mask = (img == 0)
     if img is None:
@@ -105,7 +157,7 @@ if __name__ == "__main__":
             img = cv2.imread(full_path, -1);
        # if args.get_single_channel:
        # img = img[:, :, 0]  # img = img[0,:,:]
-        newimg = scaleit_experimental(img, args.invert, args.buggy, args.cropRatio)
+        newimg = smart_norm(img, args.force_norm)  # scaleit_experimental(img, args.invert, args.buggy, args.cropRatio)
 
         if newimg is None:
 	    print 'newimg is None'

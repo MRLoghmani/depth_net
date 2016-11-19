@@ -2,9 +2,8 @@
 import pickle
 from argparse import ArgumentParser
 from os.path import join
-import feature_handler_v2
+import feature_handler_v3
 import h5py
-import ConfigParser
 import os
 
 
@@ -26,12 +25,13 @@ def get_arguments():
     parser.add_argument("--gpu_id", type=int, default=0)
     parser.add_argument("--opt_ext", default="", help="Extension to add to the filenames")
     parser.add_argument("--patchMode", action="store_true")
+    parser.add_argument("--data_collection", action="store_true")
     args = parser.parse_args()
     return args
 
 
 def handle_patches(all_files, f_extractor, directory, rootPath):
-#    import ipdb; ipdb.set_trace()
+    #    import ipdb; ipdb.set_trace()
     if not os.path.exists(directory):
         os.makedirs(directory)
     mode = f_extractor.get_mode()
@@ -56,7 +56,7 @@ def handle_patches(all_files, f_extractor, directory, rootPath):
 
 def make_features(args):
     print "Starting feature generation procedure..."
-    f_extractor = feature_handler_v2.FeatureCreator(
+    f_extractor = feature_handler_v3.FeatureCreator(
         args.net_proto, args.net_model, args.mean_pixel, args.mean_file, not args.use_cpu,
         layer_name=args.layer_name, gpu_id=args.gpu_id)
     f_extractor.batch_size = args.batch_size
@@ -66,8 +66,12 @@ def make_features(args):
     all_lines = open(args.filelist, 'rt').readlines()
     if args.patchMode:
         handle_patches(all_lines, f_extractor, args.output_filename, args.data_dir)
+    all_lines = [join(args.data_dir, line.strip() + args.opt_ext) for line in all_lines]
+    if args.data_collection:
+        stats = f_extractor.prepare_features_iter(all_lines)
+        with open(args.output_filename, 'wb') as f:
+            pickle.dump(stats, f, pickle.HIGHEST_PROTOCOL)
     else:
-        all_lines = [join(args.data_dir, line.strip() + args.opt_ext) for line in all_lines]
         # preload all features so that they are handled in batches
         f_extractor.prepare_features(all_lines)
         with open(args.output_filename, 'wb') as f:
