@@ -2,12 +2,17 @@ import warnings
 from argparse import ArgumentParser
 import numpy as np
 import cv2
-from os.path import join
+import os
+from os.path import join, dirname, exists
 from h5py import File as hfile
+from scipy import misc
+import ipdb
+
 
 def get_arguments():
     parser = ArgumentParser(
-        description='Will convert 16bit grayscale images to colorject mapping as in \"Multimodal Deep Learning for Robust RGB-D Object Recognition\"')
+        description='Will convert 16bit grayscale images to colorject mapping as \
+        in \"Multimodal Deep Learning for Robust RGB-D Object Recognition\"')
     parser.add_argument("input_dir")
     parser.add_argument("output_dir")
     parser.add_argument("image_list", help="File containing the relative path to each file we want to convert")
@@ -31,7 +36,7 @@ def crop_from_center(image, cropRatio):
 
 
 def smart_norm(img, force_norm):
-    # import ipdb; ipdb.set_trace()
+    # ipdb.set_trace()
     img = img.astype("float32")
     flat = img.ravel()
     ordered = np.argsort(flat)
@@ -48,8 +53,8 @@ def smart_norm(img, force_norm):
     return add_padding(img)
 
 
-def add_padding(imrange):
-    imsz = imrange.shape
+def add_padding(img):
+    imsz = img.shape
     mxdim = np.max(imsz)
 
     offs_col = (mxdim - imsz[1])/2
@@ -57,7 +62,7 @@ def add_padding(imrange):
     nchan = 1
     if(len(imsz) == 3):
         nchan = imsz[2]
-    imgcanvas = np.zeros((mxdim, mxdim, nchan), dtype='uint8')
+    imgcanvas = np.zeros((mxdim, mxdim, nchan), dtype=img.dtype)
     imgcanvas[offs_row:offs_row+imsz[0], offs_col:offs_col+imsz[1]] = img.reshape((imsz[0], imsz[1], nchan))
     # take rows
     if(offs_row):
@@ -73,6 +78,8 @@ def add_padding(imrange):
         imgcanvas[:, -offs_col-1:, 0] = np.tile(rc, (offs_col+1, 1)).transpose()
 
     # RESCALE
+    # ipdb.set_trace()
+    # imrange_rescale = misc.imresize(np.squeeze(imgcanvas), IMSIZE, interp='cubic')
     imrange_rescale = cv2.resize(imgcanvas, IMSIZE, interpolation=cv2.INTER_CUBIC)
     return(imrange_rescale)
 
@@ -134,17 +141,16 @@ def scaleit_experimental(img, invert, buggy, cropRatio):
     imrange_rescale = cv2.resize(imgcanvas, IMSIZE, interpolation=cv2.INTER_CUBIC) 
     return(imrange_rescale)
 
+IMSIZE = (256, 256)
 
 if __name__ == "__main__":
     args = get_arguments()
     print args
-    output_dir =  args.output_dir
+    output_dir = args.output_dir
     input_dir = args.input_dir
-    IMSIZE=(256,256)
     with open(args.image_list) as tmp:
         images = tmp.readlines()
     for i_path in images:
-#        import ipdb; ipdb.set_trace()
         img_path = i_path.strip()
         full_path = join(input_dir, img_path)
         if args.h5:
@@ -154,14 +160,17 @@ if __name__ == "__main__":
             except:
                 print full_path
         else:
-            img = cv2.imread(full_path, -1);
-       # if args.get_single_channel:
-       # img = img[:, :, 0]  # img = img[0,:,:]
+            img = cv2.imread(full_path, -1)
+        # if args.get_single_channel:
+        # img = img[:, :, 0]  # img = img[0,:,:]
         newimg = smart_norm(img, args.force_norm)  # scaleit_experimental(img, args.invert, args.buggy, args.cropRatio)
-
         if newimg is None:
-	    print 'newimg is None'
+            print 'newimg is None'
             continue
         if args.colorjet:
             newimg = cv2.applyColorMap(newimg, cv2.COLORMAP_JET)
-        cv2.imwrite(join(output_dir, img_path + args.ext), newimg)
+        outpath = join(output_dir, img_path + args.ext)
+        outdir = dirname(outpath)
+        if not exists(outdir):
+            os.makedirs(outdir)
+        cv2.imwrite(outpath, newimg)
