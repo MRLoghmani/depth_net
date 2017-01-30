@@ -16,7 +16,7 @@ from collections import namedtuple
 from os.path import join, splitext
 import time
 from multiprocessing import Process, Array
-import mkl
+#import mkl
 from sklearn.decomposition import PCA
 from scipy import io
 from sklearn.feature_selection import SelectKBest, f_regression, VarianceThreshold
@@ -344,7 +344,7 @@ if __name__ == '__main__':
 #    import ipdb; ipdb.set_trace()
     start_time = time.time()
     args = get_arguments()
-    mkl.set_num_threads(args.mkl_threads)
+#    mkl.set_num_threads(args.mkl_threads)
     print "\n"
     print args
     conf_path = args.conf_name

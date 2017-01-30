@@ -140,9 +140,10 @@ def forward_pass(images, net, transformer, batch_size, layer_names):
 
     dims = transformer.inputs['data'][1:]
     feat_holder = {}
+    # import ipdb; ipdb.set_trace()
     for layer_name in layer_names:
-        fsize = net.blobs[layer_name].data.size / \
-                net.blobs[layer_name].data.shape[0]
+        fsize = np.prod(net.blobs[layer_name].data.shape[1:])
+        # net.blobs[layer_name].data.size \ net.blobs[layer_name].data.shape[0]
         feat_holder[layer_name] = np.empty((len(images), fsize), dtype='float32')
     todoChunks = [caffe_images[x:x + batch_size]
                   for x in xrange(0, len(caffe_images), batch_size)]
@@ -184,7 +185,6 @@ class FeatureCreator:
             net_proto, mean_pixel=mean_pixel, mean_file=mean_file)
         self.features = {}
         self.layer_name = layer_name
-        self.f_size = self.net.blobs[self.layer_name].data.shape[1]
         self.batch_size = 256
         self.scale = 1
         self.verbose = verbose
@@ -223,15 +223,21 @@ class FeatureCreator:
             print "Will center data"
         # Classify the image
         print "Extracting features"
-        layers = ['fc6', 'fc7']
+#        import ipdb; ipdb.set_trace()
+        layers = ['inception_3a/pool_proj/bn', 'inception_3c/double3x3_reduce/bn',
+                  'inception_4b/1x1/bn', 'inception_4c/double3x3_reduce/bn',
+                  'inception_4d/pool_proj/bn', 'inception_5a/double3x3a/bn']
+#        layers = [layer + "target" for layer in layers]
         feats = forward_pass(images, self.net, self.transformer, self.batch_size, layers)
-        i = 0
-        for f in image_files:
+        for i, f in enumerate(image_files):
             # saves only the relative path
             short_name = f.replace(self.data_prefix, '')
             if short_name[0] == '/':
                 short_name = short_name[1:]
-            self.features[short_name] = feats.values()[0][i].ravel() # TODO join different features
+            featMap = {}
+            for layer in layers:
+                featMap[layer] = feats[layer][i].ravel()
+            self.features[short_name] = featMap
             i += 1
         self.net = None  # free video memory
 
