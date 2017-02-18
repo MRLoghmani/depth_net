@@ -142,9 +142,10 @@ def forward_pass(images, net, transformer, batch_size, layer_names):
     feat_holder = {}
     # import ipdb; ipdb.set_trace()
     for layer_name in layer_names:
-        fsize = np.prod(net.blobs[layer_name].data.shape[1:])
+        # fsize = np.prod(net.blobs[layer_name].data.shape[1:])
+        lshape = net.blobs[layer_name].data.shape[1:]
         # net.blobs[layer_name].data.size \ net.blobs[layer_name].data.shape[0]
-        feat_holder[layer_name] = np.empty((len(images), fsize), dtype='float32')
+        feat_holder[layer_name] = np.empty((len(images),) + lshape, dtype='float32')
     todoChunks = [caffe_images[x:x + batch_size]
                   for x in xrange(0, len(caffe_images), batch_size)]
     start = time.clock()
@@ -160,8 +161,9 @@ def forward_pass(images, net, transformer, batch_size, layer_names):
         net.forward()
         for layer_name in layer_names:
             features = feat_holder[layer_name]
-            features[idx:idx + bsize] = net.blobs[layer_name].data.reshape(
-                -1, net.blobs[layer_name].data.size / bsize).copy()
+            features[idx:idx + bsize, ...] = net.blobs[layer_name].data.copy()
+            # features[idx:idx + bsize] = net.blobs[layer_name].data.reshape(
+            #    -1, net.blobs[layer_name].data.size / bsize).copy()
         idx += bsize
     print "It took %f" % (time.clock() - start)
     return feat_holder
@@ -226,8 +228,9 @@ class FeatureCreator:
 #        import ipdb; ipdb.set_trace()
         layers = ['inception_3a/pool_proj/bn', 'inception_3c/double3x3_reduce/bn',
                   'inception_4b/1x1/bn', 'inception_4c/double3x3_reduce/bn',
-                  'inception_4d/pool_proj/bn', 'inception_5a/double3x3a/bn']
-#        layers = [layer + "target" for layer in layers]
+                  'inception_4d/pool_proj/bn', 'inception_5a/double3x3a/bn',
+                  'inception_5b/pool_proj/bn']
+        layers = [self.layer_name]
         feats = forward_pass(images, self.net, self.transformer, self.batch_size, layers)
         for i, f in enumerate(image_files):
             # saves only the relative path
@@ -236,7 +239,7 @@ class FeatureCreator:
                 short_name = short_name[1:]
             featMap = {}
             for layer in layers:
-                featMap[layer] = feats[layer][i].ravel()
+                featMap[layer] = feats[layer][i]
             self.features[short_name] = featMap
             i += 1
         self.net = None  # free video memory

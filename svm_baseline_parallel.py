@@ -22,7 +22,6 @@ from scipy import io
 from sklearn.feature_selection import SelectKBest, f_regression, VarianceThreshold
 from sklearn.pipeline import make_pipeline
 
-
 class RunParams:
     def __init__(self, args):
         self.pca_dims = args.PCA_dims
@@ -145,7 +144,9 @@ def prepare_jobs(split_dir, features, n_splits, jobs, classes, runParams):
 
 
 def load_split(split_path, feat_dict, classes):
-    f_size = feat_dict[feat_dict.keys()[0]].shape[0]
+#    feat_dict = feat_dict.values()[0]  # HACK!
+    firstItem = feat_dict.values()[0].values()[0]
+    f_size = firstItem.ravel().shape[0]
     ft_lines = open(split_path, 'rt').readlines()
     samples = get_samples_per_class(ft_lines, classes)
     features = []
@@ -155,7 +156,7 @@ def load_split(split_path, feat_dict, classes):
     for line in ft_lines:
         [path, classLabel] = line.split()
         nClass = int(classLabel)
-        features[nClass][ccounter[nClass]] = feat_dict[path][:f_size]
+        features[nClass][ccounter[nClass]] = feat_dict[path].values()[0][:f_size].ravel()
         ccounter[nClass] += 1
     labels = np.hstack([np.ones(data.shape[0]) * c for c,
                         data in enumerate(features)]).ravel()
@@ -186,12 +187,12 @@ def run_split(split_dir, features, n_splits, splits_acc, x, classes, runParams):
         return
     (splits_acc[x], svm) = do_svm(LoadedData(
         train_features, train_labels, test_features, test_labels), x, runParams)
-    new_feats = {}
-    for im_path in features.keys():
-        margin = svm.decision_function(features[im_path].reshape(1, -1))
-        new_feats[im_path] = margin.ravel()
-    with open('test_margins.pkl', 'w') as tmp:
-        pickle.dump(new_feats, tmp)
+    # new_feats = {}
+    # for im_path in features.keys():
+    #     margin = svm.decision_function(features[im_path].reshape(1, -1))
+    #     new_feats[im_path] = margin.ravel()
+    # with open('test_margins.pkl', 'w') as tmp:
+    #     pickle.dump(new_feats, tmp)
 
 
 def save_kernel_matrix(train_data, test_data, train_labels, test_labels, out_name):

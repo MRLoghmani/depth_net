@@ -19,7 +19,7 @@ NORM_NAME=${FEAT_FOLDER}vandal_${JOB_ID}_normalized.pkl
 ORIG_NAME=${FEAT_FOLDER}vandal_${JOB_ID}_original.pkl
 source activate digits_bvlc
 
-echo Extracting Washington normalized to $NORM_NAME
+echo Extracting Washington normalized to $NORM_NAME  # eitel mapping now
 python -u feature_extractor.py ../Washington/rgbd-normalized_gray/ Washington/all_depth_clean.txt $DEPLOY $CAFFE_MODEL $NORM_NAME --center_data --gpu_id 0 --batch-size $BSIZE --layer_name ${layer}
 echo Extracting Washington original to $ORIG_NAME
 python -u feature_extractor.py ../Washington/rgbd-original/ Washington/all_depth_clean.txt $DEPLOY $CAFFE_MODEL $ORIG_NAME --center_data --gpu_id 0 --batch-size $BSIZE --layer_name ${layer}
