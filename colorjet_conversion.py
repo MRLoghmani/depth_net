@@ -77,13 +77,7 @@ def add_padding(img):
         imgcanvas[:, 0:offs_col, 0] = np.tile(lc, (offs_col, 1)).transpose()
         imgcanvas[:, -offs_col - 1:,
                   0] = np.tile(rc, (offs_col + 1, 1)).transpose()
-
-    # RESCALE
-    # ipdb.set_trace()
-    # imrange_rescale = misc.imresize(np.squeeze(imgcanvas), IMSIZE, interp='cubic')
-    imrange_rescale = cv2.resize(
-        imgcanvas, IMSIZE, interpolation=cv2.INTER_CUBIC)
-    return(imrange_rescale)
+    return imgcanvas
 
 
 # Attention: the colorized depth image definition is: Red (close), blue(far)
@@ -213,14 +207,13 @@ if __name__ == "__main__":
         if args.cropRatio:
             cArea = get_center_crop(img, args.cropRatio)
         if args.useMask:
-            # ipdb.set_trace()
             cArea = get_mask_crop(img, full_path)
         try:
             if cArea is not None:
                 img = img[int(cArea[2]):int(cArea[3]), int(cArea[0]):int(cArea[1])]
-            # new = smart_norm(img, args.force_norm, args.padding)
-            new = scaleit_experimental(img, args.invert, args.buggy, args.padding)
-            newimg = cv2.resize(new, IMSIZE, interpolation=cv2.INTER_CUBIC)
+            new = smart_norm(img, args.force_norm, args.padding)
+            # new = scaleit_experimental(img, args.invert, args.buggy, args.padding)
+            newimg = cv2.resize(new.astype('uint8'), IMSIZE, interpolation=cv2.INTER_CUBIC)
         except:
             print "Can't process " + full_path
             emptyFiles += 1
