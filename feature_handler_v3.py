@@ -220,6 +220,9 @@ class FeatureCreator:
             es.push(im.mean(axis=tuple((0, 1))))
         mean = self.scale * es.get_mean()
         print "Image mean: %s" % str(mean)
+        if mean.ndim == 0:
+            mean = np.ones(1) * mean
+#        import ipdb; ipdb.set_trace()
         if self.center_data:
             self.transformer.set_mean('data', mean)
             print "Will center data"

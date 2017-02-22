@@ -24,6 +24,7 @@ def get_arguments():
     parser.add_argument("--invert", action="store_true")
     parser.add_argument("--buggy", action="store_true")
     parser.add_argument("--force_norm", action="store_true")
+    parser.add_argument("--SmartNorm", action="store_true")
     parser.add_argument("--padding", action="store_true")
     parser.add_argument("--cropRatio", type=float,
                         help="Value between 0 and 1, represents the percentage of the image to keep")
@@ -211,8 +212,11 @@ if __name__ == "__main__":
         try:
             if cArea is not None:
                 img = img[int(cArea[2]):int(cArea[3]), int(cArea[0]):int(cArea[1])]
-            new = smart_norm(img, args.force_norm, args.padding)
-            # new = scaleit_experimental(img, args.invert, args.buggy, args.padding)
+
+            if args.SmartNorm:
+                new = smart_norm(img, args.force_norm, args.padding)
+	    else:	        
+                new = scaleit_experimental(img, args.invert, args.buggy, args.padding)
             newimg = cv2.resize(new.astype('uint8'), IMSIZE, interpolation=cv2.INTER_CUBIC)
         except:
             print "Can't process " + full_path
