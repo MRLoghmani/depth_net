@@ -7,6 +7,7 @@ from os.path import join, dirname, exists, basename
 from h5py import File as hfile
 from scipy import misc
 import ipdb
+from tqdm import tqdm
 from math import ceil, floor
 
 
@@ -184,7 +185,7 @@ if __name__ == "__main__":
     with open(args.image_list) as tmp:
         images = tmp.readlines()
     emptyFiles = 0
-    for i_path in images:
+    for i_path in tqdm(images):
         img_path = i_path.strip()
         full_path = join(input_dir, img_path)
         if args.h5:
