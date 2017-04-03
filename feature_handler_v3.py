@@ -48,13 +48,14 @@ def get_transformer(deploy_file, mean_file=None, mean_pixel=None):
 
     t = caffe.io.Transformer(inputs={'data': dims})
     # transpose to (channels, height, width)
+    #import ipdb; ipdb.set_trace()
     t.set_transpose('data', (2, 0, 1))
 
     # color images
     if dims[1] == 3:
         # channel swap
         t.set_channel_swap('data', (2, 1, 0))
-
+    
     if mean_file:
         # set mean pixel
         print "Using mean file"
@@ -215,14 +216,18 @@ class FeatureCreator:
         images = []
         es = Estimator()
         for image_file in image_files:
-            im = load_image(image_file, height, width, mode)
+            try:
+                im = load_image(image_file, height, width, mode)
+            except:
+                print("Cant' load " + image_file)
+                continue
             images.append(im)
             es.push(im.mean(axis=tuple((0, 1))))
         mean = self.scale * es.get_mean()
         print "Image mean: %s" % str(mean)
         if mean.ndim == 0:
             mean = np.ones(1) * mean
-#        import ipdb; ipdb.set_trace()
+        # import ipdb; ipdb.set_trace()
         if self.center_data:
             self.transformer.set_mean('data', mean)
             print "Will center data"

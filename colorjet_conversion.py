@@ -194,6 +194,7 @@ if __name__ == "__main__":
                 img = h['depth'][:]
             except:
                 print "Couldn't load " + full_path
+                img = None
         else:
             img = cv2.imread(full_path, -1)
         if img is None:
@@ -204,7 +205,6 @@ if __name__ == "__main__":
         # img = img[:, :, 0]  # img = img[0,:,:]
         # newimg = smart_norm(img, args.force_norm)
         cArea = None
-        # ipdb.set_trace()
         if args.cropRatio:
             cArea = get_center_crop(img, args.cropRatio)
         if args.useMask:
@@ -212,8 +212,8 @@ if __name__ == "__main__":
         try:
             if cArea is not None:
                 img = img[int(cArea[2]):int(cArea[3]), int(cArea[0]):int(cArea[1])]
-            new = smart_norm(img, args.force_norm, args.padding)
-            # new = scaleit_experimental(img, args.invert, args.buggy, args.padding)
+            #new = smart_norm(img, args.force_norm, args.padding)
+            new = scaleit_experimental(img, args.invert, args.buggy, args.padding)
             newimg = cv2.resize(new.astype('uint8'), IMSIZE, interpolation=cv2.INTER_CUBIC)
         except:
             print "Can't process " + full_path

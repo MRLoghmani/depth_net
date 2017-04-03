@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import h5py
 from tqdm import tqdm
-from sklearn.cross_validation import train_test_split, KFold
+#from sklearn.cross_validation import train_test_split, KFold
 from sklearn.grid_search import GridSearchCV
 from sklearn.metrics import classification_report
 from sklearn.neighbors import KNeighborsClassifier
