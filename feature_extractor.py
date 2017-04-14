@@ -17,7 +17,7 @@ def get_arguments():
     parser.add_argument("output_filename")
     parser.add_argument("--mean_pixel", type=float)
     parser.add_argument("--mean_file")
-    parser.add_argument("--batch-size", type=int, default=256)
+    parser.add_argument("--batch_size", type=int, default=256)
     parser.add_argument("--layer_name", help="Default is FC7", default='fc7')
     parser.add_argument("--use_cpu", action="store_true", help="If set false, will force CPU inference")
     parser.add_argument("--center_data", action="store_true", help="If set will center the data")

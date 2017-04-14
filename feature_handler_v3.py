@@ -96,7 +96,15 @@ def load_image(path, height, width, mode='RGB'):
         (RGB for color or L for grayscale)
     """
     image = PIL.Image.open(path)
-    #    import ipdb; ipdb.set_trace()
+
+    if False:
+        width, height = image.size   # Get dimensions
+        new_width = new_height = 227
+        left = (width - new_width)/2
+        top = (height - new_height)/2
+        right = (width + new_width)/2
+        bottom = (height + new_height)/2
+        image = image.crop((left, top, right, bottom))
     try:
         image = image.resize((width, height), PIL.Image.BILINEAR)
     except:
@@ -227,7 +235,6 @@ class FeatureCreator:
         print "Image mean: %s" % str(mean)
         if mean.ndim == 0:
             mean = np.ones(1) * mean
-        # import ipdb; ipdb.set_trace()
         if self.center_data:
             self.transformer.set_mean('data', mean)
             print "Will center data"
@@ -239,6 +246,7 @@ class FeatureCreator:
                   'inception_4d/pool_proj/bn', 'inception_5a/double3x3a/bn',
                   'inception_5b/pool_proj/bn']
         layers = [self.layer_name]
+        #import ipdb; ipdb.set_trace()
         feats = forward_pass(images, self.net, self.transformer, self.batch_size, layers)
         for i, f in enumerate(image_files):
             # saves only the relative path
